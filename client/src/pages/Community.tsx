@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Heart, MessageCircle, Share2, Send } from "lucide-react";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import AppNavigation from "@/components/AppNavigation";
 import type { PostWithAuthor } from "@shared/schema";
 
 export default function Community() {

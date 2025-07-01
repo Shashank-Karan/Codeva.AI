@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Code, Users, Bug, Eye, Menu } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Landing() {
   return (
@@ -21,10 +22,10 @@ export default function Landing() {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-blue-300 hover:text-white transition-colors font-medium">Home</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">Visualize</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">Community</a>
-            <a href="#" className="text-gray-300 hover:text-white transition-colors">Debug Code</a>
+            <Link href="/" className="text-blue-300 hover:text-white transition-colors font-medium">Home</Link>
+            <Link href="/visualize" className="text-gray-300 hover:text-white transition-colors">Visualize</Link>
+            <Link href="/community" className="text-gray-300 hover:text-white transition-colors">Community</Link>
+            <Link href="/debug" className="text-gray-300 hover:text-white transition-colors">Debug Code</Link>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -67,14 +68,18 @@ export default function Landing() {
           
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-              <Eye className="h-5 w-5 mr-2" />
-              Start Visualizing
-            </Button>
-            <Button size="lg" variant="outline" className="border-gray-400/30 text-gray-200 hover:bg-white/10 px-8 py-4 text-lg backdrop-blur-sm">
-              <Users className="h-5 w-5 mr-2" />
-              Explore Community
-            </Button>
+            <Link href="/visualize">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                <Eye className="h-5 w-5 mr-2" />
+                Start Visualizing
+              </Button>
+            </Link>
+            <Link href="/community">
+              <Button size="lg" variant="outline" className="border-gray-400/30 text-gray-200 hover:bg-white/10 px-8 py-4 text-lg backdrop-blur-sm">
+                <Users className="h-5 w-5 mr-2" />
+                Explore Community
+              </Button>
+            </Link>
           </div>
         </div>
 

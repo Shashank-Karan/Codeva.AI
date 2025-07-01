@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import AppNavigation from "@/components/AppNavigation";
 import { AlertTriangle, Code, CheckCircle, Info } from "lucide-react";
 
 interface DebugResult {

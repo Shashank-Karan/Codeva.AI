@@ -10,6 +10,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import FlowchartViewer from "@/components/FlowchartViewer";
+import AppNavigation from "@/components/AppNavigation";
 import { Lightbulb, GitBranch, ListOrdered, Workflow } from "lucide-react";
 
 interface FlowchartData {
@@ -66,7 +67,9 @@ export default function Visualize() {
 
   return (
     <div>
-      <div className="mb-8">
+      <AppNavigation />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Code Visualization</h2>
         <p className="text-gray-600">Paste your code below to get AI-powered explanations, flowcharts, and line-by-line analysis.</p>
       </div>
@@ -225,6 +228,7 @@ export default function Visualize() {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
