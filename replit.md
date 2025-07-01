@@ -128,6 +128,7 @@ CodeFlow is a full-stack web application designed for code analysis, visualizati
 - **SESSION_SECRET**: Session encryption secret
 
 ## Changelog
+- July 01, 2025. Created modern landing page matching CodeVis.ai design with dark gradient background, hero section, and feature cards
 - July 01, 2025. Upgraded to professional flowchart style with proper SVG shapes, shadows, and grid layout
 - July 01, 2025. Enhanced Code Analysis Engine with visual flowchart generation and interactive diagrams
 - July 01, 2025. Initial setup
