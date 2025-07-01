@@ -149,90 +149,238 @@ export default function Landing() {
       {/* How It Works Section */}
       <div className="relative z-10 bg-slate-800/20 backdrop-blur-sm border-y border-slate-700/30">
         <div className="max-w-7xl mx-auto px-4 lg:px-6 py-20">
+          {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">How It Works</h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Experience the power of AI-driven code analysis in three simple steps
+              Transform your code understanding with AI-powered analysis, visualization, and debugging
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-12">
-            {/* Step 1 */}
-            <div className="text-center group">
-              <div className="relative mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <Code className="h-10 w-10 text-white" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  1
-                </div>
+          {/* Top Features Grid */}
+          <div className="grid md:grid-cols-4 gap-6 mb-16">
+            {/* Code Input */}
+            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Code className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Paste Your Code</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Simply paste your code snippet in any supported language. Our platform supports Python, JavaScript, 
-                Java, C++, React, Node.js, TypeScript, Go, Rust, and many more programming languages.
-              </p>
+              <h3 className="text-lg font-semibold text-white mb-2">Code Input</h3>
+              <p className="text-gray-400 text-sm">Paste any code snippet in 20+ programming languages</p>
             </div>
 
-            {/* Step 2 */}
-            <div className="text-center group">
-              <div className="relative mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <Eye className="h-10 w-10 text-white" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-purple-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  2
-                </div>
+            {/* AI Analysis */}
+            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Eye className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">AI Analysis</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Our advanced AI engine analyzes your code structure, logic flow, and functionality. It creates 
-                interactive flowcharts, provides line-by-line explanations, and identifies potential improvements.
-              </p>
+              <h3 className="text-lg font-semibold text-white mb-2">AI Analysis</h3>
+              <p className="text-gray-400 text-sm">Advanced AI processes your code logic and structure</p>
             </div>
 
-            {/* Step 3 */}
-            <div className="text-center group">
-              <div className="relative mb-8">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
-                  <Bug className="h-10 w-10 text-white" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  3
-                </div>
+            {/* Visualization */}
+            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Bug className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-4">Get Insights</h3>
-              <p className="text-gray-300 leading-relaxed">
-                Receive comprehensive visual explanations, debug suggestions, and optimization recommendations. 
-                Share your results with the community or use them to enhance your coding skills.
-              </p>
+              <h3 className="text-lg font-semibold text-white mb-2">Debugging</h3>
+              <p className="text-gray-400 text-sm">Identify errors and get intelligent fix suggestions</p>
+            </div>
+
+            {/* Community */}
+            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">Community</h3>
+              <p className="text-gray-400 text-sm">Share insights and learn from other developers</p>
             </div>
           </div>
 
-          {/* Interactive Demo Preview */}
-          <div className="mt-20">
-            <div className="bg-slate-900/60 rounded-2xl border border-slate-700/50 p-8 backdrop-blur-sm">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-white">Try It Now</h3>
-                <div className="flex space-x-2">
-                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                  <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                  <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+          {/* Detailed Feature Sections */}
+          <div className="space-y-16">
+            {/* Code Visualization Feature */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h3 className="text-3xl font-bold text-white mb-6">Interactive Code Visualization</h3>
+                <div className="space-y-4 text-gray-300">
+                  <p className="text-lg leading-relaxed">
+                    Transform complex algorithms into clear, interactive flowcharts that show exactly how your code executes step by step.
+                  </p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Visual Flow Diagrams:</strong> See your code logic as interactive flowcharts with clickable nodes</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Line-by-Line Analysis:</strong> Get detailed explanations for every line of code</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-cyan-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Variable Tracking:</strong> Monitor how variables change throughout execution</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Multi-Language Support:</strong> Works with Python, JavaScript, Java, C++, and more</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
-              <div className="bg-slate-800/80 rounded-lg p-6 font-mono text-sm">
-                <div className="text-gray-400 mb-2"># Example Python function</div>
-                <div className="text-blue-300">def <span className="text-yellow-300">fibonacci</span>(<span className="text-red-300">n</span>):</div>
-                <div className="text-gray-300 ml-4">if n &lt;= 1:</div>
-                <div className="text-gray-300 ml-8">return n</div>
-                <div className="text-gray-300 ml-4">return fibonacci(n-1) + fibonacci(n-2)</div>
+              <div className="relative">
+                <div className="bg-slate-900/60 rounded-2xl border border-slate-700/50 p-8 backdrop-blur-sm">
+                  <div className="flex items-center justify-between mb-6">
+                    <h4 className="text-xl font-bold text-white">Live Demo</h4>
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                      <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    {/* Flowchart visualization mockup */}
+                    <div className="bg-slate-800/80 rounded-lg p-4">
+                      <div className="flex items-center justify-center space-x-4">
+                        <div className="w-16 h-12 bg-blue-500/20 border-2 border-blue-500 rounded-lg flex items-center justify-center">
+                          <span className="text-xs text-blue-300 font-mono">START</span>
+                        </div>
+                        <div className="w-6 h-0.5 bg-gray-600"></div>
+                        <div className="w-16 h-12 bg-purple-500/20 border-2 border-purple-500 rounded-lg flex items-center justify-center">
+                          <span className="text-xs text-purple-300 font-mono">PROCESS</span>
+                        </div>
+                        <div className="w-6 h-0.5 bg-gray-600"></div>
+                        <div className="w-16 h-12 bg-green-500/20 border-2 border-green-500 rounded-lg flex items-center justify-center">
+                          <span className="text-xs text-green-300 font-mono">END</span>
+                        </div>
+                      </div>
+                    </div>
+                    <Link href="/visualize">
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                        Try Visualization →
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div className="mt-6 text-center">
-                <Link href="/visualize">
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3">
-                    Visualize This Code
-                  </Button>
-                </Link>
+            </div>
+
+            {/* AI Debugging Feature */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="lg:order-2">
+                <h3 className="text-3xl font-bold text-white mb-6">Intelligent Code Debugging</h3>
+                <div className="space-y-4 text-gray-300">
+                  <p className="text-lg leading-relaxed">
+                    AI-powered debugging that not only finds issues but provides detailed explanations and automatic fixes.
+                  </p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Error Detection:</strong> Automatically identify syntax errors, logic bugs, and performance issues</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Smart Fixes:</strong> Get intelligent suggestions with corrected code snippets</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Best Practices:</strong> Learn coding standards and optimization techniques</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Code Quality:</strong> Improve readability, maintainability, and performance</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="lg:order-1 relative">
+                <div className="bg-slate-900/60 rounded-2xl border border-slate-700/50 p-8 backdrop-blur-sm">
+                  <div className="flex items-center justify-between mb-6">
+                    <h4 className="text-xl font-bold text-white">Debug Analysis</h4>
+                    <div className="px-3 py-1 bg-red-500/20 border border-red-500/30 rounded-full text-red-300 text-sm">
+                      3 Issues Found
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                        <span className="text-red-300 text-sm font-medium">Syntax Error</span>
+                      </div>
+                      <p className="text-gray-400 text-xs">Missing semicolon on line 12</p>
+                    </div>
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                        <span className="text-yellow-300 text-sm font-medium">Performance</span>
+                      </div>
+                      <p className="text-gray-400 text-xs">Inefficient loop detected</p>
+                    </div>
+                    <Link href="/debug">
+                      <Button className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white">
+                        Start Debugging →
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Community Feature */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h3 className="text-3xl font-bold text-white mb-6">Developer Community Hub</h3>
+                <div className="space-y-4 text-gray-300">
+                  <p className="text-lg leading-relaxed">
+                    Connect with developers worldwide, share your code visualizations, and learn from the community's collective knowledge.
+                  </p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Code Sharing:</strong> Post your algorithms and visualizations for others to learn from</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Collaborative Learning:</strong> Get feedback and suggestions from experienced developers</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-pink-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Discussion Forums:</strong> Ask questions and participate in coding discussions</span>
+                    </li>
+                    <li className="flex items-start space-x-3">
+                      <div className="w-2 h-2 bg-cyan-500 rounded-full mt-2"></div>
+                      <span><strong className="text-white">Achievement System:</strong> Earn points and badges for helping others</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="bg-slate-900/60 rounded-2xl border border-slate-700/50 p-8 backdrop-blur-sm">
+                  <div className="flex items-center justify-between mb-6">
+                    <h4 className="text-xl font-bold text-white">Community Feed</h4>
+                    <div className="px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full text-green-300 text-sm">
+                      Active
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-slate-800/80 rounded-lg p-4">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+                        <div>
+                          <p className="text-white text-sm font-medium">Sarah_Dev</p>
+                          <p className="text-gray-400 text-xs">Shared a sorting algorithm</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-4 text-gray-400 text-xs">
+                        <span>👍 24 likes</span>
+                        <span>💬 8 comments</span>
+                      </div>
+                    </div>
+                    <Link href="/community">
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+                        Join Community →
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
