@@ -7,119 +7,262 @@ interface FlowchartViewerProps {
 }
 
 const FlowchartViewer: React.FC<FlowchartViewerProps> = ({ data, className = '' }) => {
-  // Scale nodes to fit in container
+  // Responsive scaling based on container
+  const getResponsiveLayout = () => {
+    const baseWidth = 800;
+    const baseHeight = 600;
+    return { width: baseWidth, height: baseHeight };
+  };
+
+  const layout = getResponsiveLayout();
+
   const getScaledPosition = (x: number, y: number) => {
-    const containerWidth = 800;
-    const containerHeight = 500;
     return {
-      x: Math.max(10, Math.min(containerWidth - 150, (x / 1000) * containerWidth)),
-      y: Math.max(10, Math.min(containerHeight - 60, (y / 600) * containerHeight))
+      x: Math.max(20, Math.min(layout.width - 180, (x / 1000) * layout.width)),
+      y: Math.max(20, Math.min(layout.height - 80, (y / 600) * layout.height))
     };
   };
 
-  const getNodeStyle = (node: any) => {
-    const scaled = getScaledPosition(node.x, node.y);
-    
-    const baseStyle = {
-      position: 'absolute' as const,
-      left: `${scaled.x}px`,
-      top: `${scaled.y}px`,
-      padding: '10px 15px',
-      fontSize: '13px',
-      fontWeight: '600',
-      border: '2px solid',
-      borderRadius: '6px',
-      backgroundColor: '#ffffff',
-      cursor: 'default',
-      minWidth: '120px',
-      maxWidth: '180px',
-      textAlign: 'center' as const,
-      zIndex: 10,
-      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-      wordWrap: 'break-word' as const,
-      lineHeight: '1.4',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '45px'
-    };
-
-    switch (node.type) {
+  const getNodeDimensions = (type: string) => {
+    switch (type) {
       case 'start':
-        return {
-          ...baseStyle,
-          borderRadius: '30px',
-          backgroundColor: '#10b981',
-          borderColor: '#059669',
-          color: '#ffffff',
-        };
       case 'end':
-        return {
-          ...baseStyle,
-          borderRadius: '30px',
-          backgroundColor: '#ef4444',
-          borderColor: '#dc2626',
-          color: '#ffffff',
-        };
+        return { width: 140, height: 60 };
       case 'decision':
-        return {
-          ...baseStyle,
-          borderRadius: '0',
-          transform: 'rotate(45deg)',
-          backgroundColor: '#f59e0b',
-          borderColor: '#d97706',
-          color: '#ffffff',
-          minWidth: '100px',
-          minHeight: '100px',
-        };
+        return { width: 120, height: 80 };
       case 'input':
-        return {
-          ...baseStyle,
-          backgroundColor: '#3b82f6',
-          borderColor: '#2563eb',
-          color: '#ffffff',
-          clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)',
-        };
       case 'output':
-        return {
-          ...baseStyle,
-          backgroundColor: '#8b5cf6',
-          borderColor: '#7c3aed',
-          color: '#ffffff',
-          clipPath: 'polygon(0% 0%, 90% 0%, 100% 100%, 10% 100%)',
-        };
+        return { width: 150, height: 50 };
       default: // process
-        return {
-          ...baseStyle,
-          backgroundColor: '#06b6d4',
-          borderColor: '#0891b2',
-          color: '#ffffff',
-        };
+        return { width: 140, height: 50 };
     }
   };
 
-  const getConnectionPoints = (from: string, to: string) => {
-    const fromNode = data.nodes.find(n => n.id === from);
-    const toNode = data.nodes.find(n => n.id === to);
+  const renderNode = (node: any) => {
+    const pos = getScaledPosition(node.x, node.y);
+    const dims = getNodeDimensions(node.type);
+    const id = `node-${node.id}`;
+
+    switch (node.type) {
+      case 'start':
+      case 'end':
+        return (
+          <g key={node.id}>
+            <ellipse
+              cx={pos.x + dims.width / 2}
+              cy={pos.y + dims.height / 2}
+              rx={dims.width / 2}
+              ry={dims.height / 2}
+              fill={node.type === 'start' ? '#ffffff' : '#ffffff'}
+              stroke={node.type === 'start' ? '#22c55e' : '#ef4444'}
+              strokeWidth="2"
+              filter="url(#shadow)"
+            />
+            <text
+              x={pos.x + dims.width / 2}
+              y={pos.y + dims.height / 2}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#374151"
+              fontSize="14"
+              fontWeight="500"
+            >
+              {node.label}
+            </text>
+          </g>
+        );
+
+      case 'decision':
+        const centerX = pos.x + dims.width / 2;
+        const centerY = pos.y + dims.height / 2;
+        const halfWidth = dims.width / 2;
+        const halfHeight = dims.height / 2;
+        return (
+          <g key={node.id}>
+            <polygon
+              points={`${centerX},${centerY - halfHeight} ${centerX + halfWidth},${centerY} ${centerX},${centerY + halfHeight} ${centerX - halfWidth},${centerY}`}
+              fill="#ffffff"
+              stroke="#f59e0b"
+              strokeWidth="2"
+              filter="url(#shadow)"
+            />
+            <text
+              x={centerX}
+              y={centerY}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#374151"
+              fontSize="12"
+              fontWeight="500"
+            >
+              {node.label}
+            </text>
+          </g>
+        );
+
+      case 'input':
+      case 'output':
+        const skew = 15;
+        return (
+          <g key={node.id}>
+            <polygon
+              points={`${pos.x + skew},${pos.y} ${pos.x + dims.width},${pos.y} ${pos.x + dims.width - skew},${pos.y + dims.height} ${pos.x},${pos.y + dims.height}`}
+              fill="#ffffff"
+              stroke={node.type === 'input' ? '#3b82f6' : '#8b5cf6'}
+              strokeWidth="2"
+              filter="url(#shadow)"
+            />
+            <text
+              x={pos.x + dims.width / 2}
+              y={pos.y + dims.height / 2}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#374151"
+              fontSize="13"
+              fontWeight="500"
+            >
+              {node.label}
+            </text>
+          </g>
+        );
+
+      default: // process
+        return (
+          <g key={node.id}>
+            <rect
+              x={pos.x}
+              y={pos.y}
+              width={dims.width}
+              height={dims.height}
+              rx="4"
+              fill="#ffffff"
+              stroke="#06b6d4"
+              strokeWidth="2"
+              filter="url(#shadow)"
+            />
+            <text
+              x={pos.x + dims.width / 2}
+              y={pos.y + dims.height / 2}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fill="#374151"
+              fontSize="13"
+              fontWeight="500"
+            >
+              {node.label}
+            </text>
+          </g>
+        );
+    }
+  };
+
+  const getConnectionPoints = (fromNode: any, toNode: any) => {
+    const fromPos = getScaledPosition(fromNode.x, fromNode.y);
+    const toPos = getScaledPosition(toNode.x, toNode.y);
+    const fromDims = getNodeDimensions(fromNode.type);
+    const toDims = getNodeDimensions(toNode.type);
+
+    const fromCenterX = fromPos.x + fromDims.width / 2;
+    const fromCenterY = fromPos.y + fromDims.height / 2;
+    const toCenterX = toPos.x + toDims.width / 2;
+    const toCenterY = toPos.y + toDims.height / 2;
+
+    // Calculate connection points on node edges
+    let startX, startY, endX, endY;
+
+    // Determine direction
+    const dx = toCenterX - fromCenterX;
+    const dy = toCenterY - fromCenterY;
+
+    // From node exit point
+    if (Math.abs(dx) > Math.abs(dy)) {
+      // Horizontal connection
+      if (dx > 0) {
+        startX = fromPos.x + fromDims.width;
+        startY = fromCenterY;
+      } else {
+        startX = fromPos.x;
+        startY = fromCenterY;
+      }
+    } else {
+      // Vertical connection
+      if (dy > 0) {
+        startX = fromCenterX;
+        startY = fromPos.y + fromDims.height;
+      } else {
+        startX = fromCenterX;
+        startY = fromPos.y;
+      }
+    }
+
+    // To node entry point
+    if (Math.abs(dx) > Math.abs(dy)) {
+      // Horizontal connection
+      if (dx > 0) {
+        endX = toPos.x;
+        endY = toCenterY;
+      } else {
+        endX = toPos.x + toDims.width;
+        endY = toCenterY;
+      }
+    } else {
+      // Vertical connection
+      if (dy > 0) {
+        endX = toCenterX;
+        endY = toPos.y;
+      } else {
+        endX = toCenterX;
+        endY = toPos.y + toDims.height;
+      }
+    }
+
+    return { startX, startY, endX, endY };
+  };
+
+  const renderConnection = (edge: any, index: number) => {
+    const fromNode = data.nodes.find(n => n.id === edge.from);
+    const toNode = data.nodes.find(n => n.id === edge.to);
     
     if (!fromNode || !toNode) return null;
 
-    const fromPos = getScaledPosition(fromNode.x, fromNode.y);
-    const toPos = getScaledPosition(toNode.x, toNode.y);
+    const { startX, startY, endX, endY } = getConnectionPoints(fromNode, toNode);
 
-    const startX = fromPos.x + 60;
-    const startY = fromPos.y + 25;
-    const endX = toPos.x + 60;
-    const endY = toPos.y + 25;
+    // Create path with rounded corners for professional look
+    const midX = (startX + endX) / 2;
+    const midY = (startY + endY) / 2;
+    
+    let pathData;
+    if (Math.abs(endX - startX) > Math.abs(endY - startY)) {
+      // Horizontal path
+      pathData = `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`;
+    } else {
+      // Vertical path
+      pathData = `M ${startX} ${startY} L ${startX} ${midY} L ${endX} ${midY} L ${endX} ${endY}`;
+    }
 
-    return {
-      startX,
-      startY,
-      endX,
-      endY,
-      midX: (startX + endX) / 2,
-      midY: (startY + endY) / 2
-    };
+    return (
+      <g key={index}>
+        <path
+          d={pathData}
+          fill="none"
+          stroke="#374151"
+          strokeWidth="2"
+          markerEnd="url(#arrowhead)"
+        />
+        {edge.label && (
+          <text
+            x={midX}
+            y={midY - 10}
+            textAnchor="middle"
+            fill="#6b7280"
+            fontSize="12"
+            fontWeight="500"
+          >
+            {edge.label}
+          </text>
+        )}
+      </g>
+    );
   };
 
   if (!data || !data.nodes || data.nodes.length === 0) {
@@ -134,101 +277,72 @@ const FlowchartViewer: React.FC<FlowchartViewerProps> = ({ data, className = '' 
   }
 
   return (
-    <div className={`relative bg-gradient-to-br from-blue-50 to-indigo-50 border rounded-lg overflow-hidden ${className}`} style={{ height: '500px', width: '100%' }}>
-      <svg 
-        className="absolute inset-0 w-full h-full"
-        viewBox="0 0 800 500"
-        style={{ zIndex: 1 }}
-      >
-        <defs>
-          <marker
-            id="arrowhead"
-            markerWidth="10"
-            markerHeight="7"
-            refX="9"
-            refY="3.5"
-            orient="auto"
-          >
-            <polygon
-              points="0 0, 10 3.5, 0 7"
-              fill="#4f46e5"
-            />
-          </marker>
-        </defs>
-        
-        {data.edges && data.edges.map((edge, index) => {
-          const points = getConnectionPoints(edge.from, edge.to);
-          if (!points) return null;
-          
-          return (
-            <g key={index}>
-              <line
-                x1={points.startX}
-                y1={points.startY}
-                x2={points.endX}
-                y2={points.endY}
-                stroke="#4f46e5"
-                strokeWidth="3"
-                markerEnd="url(#arrowhead)"
-                strokeDasharray="none"
-              />
-              {edge.label && (
-                <text
-                  x={points.midX}
-                  y={points.midY - 8}
-                  fill="#4f46e5"
-                  fontSize="12"
-                  textAnchor="middle"
-                  fontWeight="600"
-                  style={{ 
-                    textShadow: '1px 1px 2px rgba(255,255,255,0.9)',
-                    filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))'
-                  }}
-                >
-                  {edge.label}
-                </text>
-              )}
-            </g>
-          );
-        })}
-      </svg>
-
-      {data.nodes.map((node) => (
-        <div
-          key={node.id}
-          style={getNodeStyle(node)}
-          title={`${node.type.toUpperCase()}: ${node.label}`}
+    <div className={`w-full bg-white border rounded-lg overflow-hidden ${className}`}>
+      <div className="w-full overflow-auto" style={{ minHeight: '500px' }}>
+        <svg 
+          width="100%"
+          height="600"
+          viewBox={`0 0 ${layout.width} ${layout.height}`}
+          className="min-w-full"
+          style={{ background: '#fafafa' }}
         >
-          <div style={{ 
-            transform: node.type === 'decision' ? 'rotate(-45deg)' : 'none',
-            maxWidth: '100%',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}>
-            {node.label}
-          </div>
-        </div>
-      ))}
-      
-      {/* Simple legend */}
-      <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg p-3 text-xs border shadow-lg">
-        <div className="font-bold mb-2 text-gray-700">Flow Elements</div>
-        <div className="space-y-1.5">
+          <defs>
+            {/* Shadow filter */}
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="2" dy="2" stdDeviation="3" floodColor="#00000020"/>
+            </filter>
+            
+            {/* Arrow marker */}
+            <marker
+              id="arrowhead"
+              markerWidth="10"
+              markerHeight="7"
+              refX="9"
+              refY="3.5"
+              orient="auto"
+              markerUnits="strokeWidth"
+            >
+              <polygon
+                points="0 0, 10 3.5, 0 7"
+                fill="#374151"
+              />
+            </marker>
+          </defs>
+
+          {/* Grid pattern for professional look */}
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+
+          {/* Render connections */}
+          {data.edges && data.edges.map((edge, index) => renderConnection(edge, index))}
+
+          {/* Render nodes */}
+          {data.nodes.map(node => renderNode(node))}
+        </svg>
+      </div>
+
+      {/* Professional legend */}
+      <div className="border-t bg-gray-50 p-4">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-emerald-500 flex-shrink-0"></div>
-            <span className="text-gray-600">Start</span>
+            <div className="w-6 h-4 border-2 border-green-500 bg-white rounded-full"></div>
+            <span className="text-gray-700">Start/End</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-cyan-500 flex-shrink-0"></div>
-            <span className="text-gray-600">Process</span>
+            <div className="w-6 h-4 border-2 border-cyan-500 bg-white"></div>
+            <span className="text-gray-700">Process</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-amber-500 rotate-45 flex-shrink-0"></div>
-            <span className="text-gray-600">Decision</span>
+            <div className="w-4 h-4 border-2 border-amber-500 bg-white transform rotate-45"></div>
+            <span className="text-gray-700">Decision</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-red-500 flex-shrink-0"></div>
-            <span className="text-gray-600">End</span>
+            <div className="w-6 h-4 border-2 border-blue-500 bg-white transform skew-x-12"></div>
+            <span className="text-gray-700">Input/Output</span>
           </div>
         </div>
       </div>

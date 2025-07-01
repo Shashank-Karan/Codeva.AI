@@ -61,15 +61,28 @@ For the visual flowchart:
   * "input": User input (blue parallelogram)
   * "output": Display output (purple parallelogram)
 
-Layout guidelines:
-- Start at x=400, y=50
-- Space nodes vertically by 100-150px
-- For parallel paths, offset horizontally by 200-300px
+Layout guidelines (professional flowchart style):
+- Start node at x=400, y=60
+- Space nodes vertically by 120-150px apart
+- For decision branches: left path at x=200, right path at x=600
+- For parallel processes: offset horizontally by 250-300px
 - Keep x coordinates between 100-700
-- Keep y coordinates between 50-550
+- Keep y coordinates between 60-540
+- Use consistent vertical alignment for similar process steps
 
-Example flow for a simple function:
-Start -> Input -> Process -> Decision -> Output/End
+Professional flow patterns:
+- Linear: Start -> Process1 -> Process2 -> End (all at x=400)
+- Decision: Start -> Decision (splits to left/right) -> merge back to End
+- Loop: Include feedback arrows for iterative processes
+- Parallel: Split processes horizontally, then merge
+
+Example coordinates for typical patterns:
+- Start: x=400, y=60
+- First Process: x=400, y=180  
+- Decision: x=400, y=300
+- Left Branch: x=200, y=420
+- Right Branch: x=600, y=420
+- End: x=400, y=540
 
 Respond with JSON in this format:
 {
