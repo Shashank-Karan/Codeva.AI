@@ -7,10 +7,26 @@ const ai = new GoogleGenAI({
 export interface CodeAnalysisResult {
   explanation: string;
   flowchart: string;
+  visualFlowchart: FlowchartData;
   lineByLineAnalysis: Array<{
     line: number;
     content: string;
     explanation: string;
+  }>;
+}
+
+export interface FlowchartData {
+  nodes: Array<{
+    id: string;
+    type: 'start' | 'process' | 'decision' | 'end' | 'input' | 'output';
+    label: string;
+    x: number;
+    y: number;
+  }>;
+  edges: Array<{
+    from: string;
+    to: string;
+    label?: string;
   }>;
 }
 
@@ -30,12 +46,41 @@ export async function analyzeCode(code: string, language: string): Promise<CodeA
     const systemPrompt = `You are a code analysis expert. Analyze the provided ${language} code and provide:
 1. A clear explanation of what the code does
 2. A textual flowchart description (use arrows and boxes in text format)
-3. Line-by-line analysis with explanations
+3. A visual flowchart with nodes and edges for diagram rendering
+4. Line-by-line analysis with explanations
+
+For the visual flowchart, create nodes with these types:
+- "start": Entry point (oval shape)
+- "process": Processing step (rectangle)
+- "decision": Conditional logic (diamond)
+- "end": Exit point (oval shape)  
+- "input": User input (parallelogram)
+- "output": Display output (parallelogram)
+
+Position nodes with x,y coordinates for proper layout (0-1000 range).
 
 Respond with JSON in this format:
 {
   "explanation": "Clear explanation of the code",
   "flowchart": "Textual flowchart with boxes and arrows",
+  "visualFlowchart": {
+    "nodes": [
+      {
+        "id": "node1",
+        "type": "start",
+        "label": "Start",
+        "x": 500,
+        "y": 50
+      }
+    ],
+    "edges": [
+      {
+        "from": "node1", 
+        "to": "node2",
+        "label": "next"
+      }
+    ]
+  },
   "lineByLineAnalysis": [
     {
       "line": 1,
@@ -55,6 +100,38 @@ Respond with JSON in this format:
           properties: {
             explanation: { type: "string" },
             flowchart: { type: "string" },
+            visualFlowchart: {
+              type: "object",
+              properties: {
+                nodes: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: { type: "string" },
+                      type: { type: "string", enum: ["start", "process", "decision", "end", "input", "output"] },
+                      label: { type: "string" },
+                      x: { type: "number" },
+                      y: { type: "number" }
+                    },
+                    required: ["id", "type", "label", "x", "y"]
+                  }
+                },
+                edges: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      from: { type: "string" },
+                      to: { type: "string" },
+                      label: { type: "string" }
+                    },
+                    required: ["from", "to"]
+                  }
+                }
+              },
+              required: ["nodes", "edges"]
+            },
             lineByLineAnalysis: {
               type: "array",
               items: {
@@ -68,7 +145,7 @@ Respond with JSON in this format:
               },
             },
           },
-          required: ["explanation", "flowchart", "lineByLineAnalysis"],
+          required: ["explanation", "flowchart", "visualFlowchart", "lineByLineAnalysis"],
         },
       },
       contents: `Analyze this ${language} code:\n\n${code}`,

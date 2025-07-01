@@ -5,14 +5,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Lightbulb, GitBranch, ListOrdered } from "lucide-react";
+import FlowchartViewer from "@/components/FlowchartViewer";
+import { Lightbulb, GitBranch, ListOrdered, Workflow } from "lucide-react";
+
+interface FlowchartData {
+  nodes: Array<{
+    id: string;
+    type: 'start' | 'process' | 'decision' | 'end' | 'input' | 'output';
+    label: string;
+    x: number;
+    y: number;
+  }>;
+  edges: Array<{
+    from: string;
+    to: string;
+    label?: string;
+  }>;
+}
 
 interface AnalysisResult {
   explanation: string;
   flowchart: string;
+  visualFlowchart: FlowchartData;
   lineByLineAnalysis: Array<{
     line: number;
     content: string;
@@ -153,11 +171,34 @@ export default function Visualize() {
                 <div>
                   <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center">
                     <GitBranch className="w-5 h-5 text-blue-500 mr-2" />
-                    Flowchart
+                    Flow Diagram
                   </h4>
-                  <div className="bg-gray-50 rounded-md p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono">
-                    {results.flowchart}
-                  </div>
+                  <Tabs defaultValue="visual" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="visual" className="flex items-center gap-2">
+                        <Workflow className="w-4 h-4" />
+                        Visual Diagram
+                      </TabsTrigger>
+                      <TabsTrigger value="text" className="flex items-center gap-2">
+                        <GitBranch className="w-4 h-4" />
+                        Text Flow
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="visual" className="mt-4">
+                      {results.visualFlowchart ? (
+                        <FlowchartViewer data={results.visualFlowchart} className="w-full" />
+                      ) : (
+                        <div className="bg-gray-50 rounded-md p-4 text-center text-gray-500">
+                          Visual flowchart not available
+                        </div>
+                      )}
+                    </TabsContent>
+                    <TabsContent value="text" className="mt-4">
+                      <div className="bg-gray-50 rounded-md p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                        {results.flowchart}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </div>
 
                 {/* Line by Line */}

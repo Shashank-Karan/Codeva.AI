@@ -36,9 +36,11 @@ CodeFlow is a full-stack web application designed for code analysis, visualizati
 - **Technology**: Google Gemini AI API
 - **Features**: 
   - Line-by-line code analysis
-  - Flowchart generation (textual format)
+  - Visual flowchart generation with interactive diagrams
+  - Textual flowchart descriptions
   - Code explanation and documentation
   - Support for multiple programming languages
+  - Interactive node-based flow visualization
 
 ### Debug System
 - **Purpose**: Identify and fix code issues
@@ -126,6 +128,7 @@ CodeFlow is a full-stack web application designed for code analysis, visualizati
 - **SESSION_SECRET**: Session encryption secret
 
 ## Changelog
+- July 01, 2025. Enhanced Code Analysis Engine with visual flowchart generation and interactive diagrams
 - July 01, 2025. Initial setup
 
 ## User Preferences
