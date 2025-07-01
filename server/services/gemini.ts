@@ -49,15 +49,27 @@ export async function analyzeCode(code: string, language: string): Promise<CodeA
 3. A visual flowchart with nodes and edges for diagram rendering
 4. Line-by-line analysis with explanations
 
-For the visual flowchart, create nodes with these types:
-- "start": Entry point (oval shape)
-- "process": Processing step (rectangle)
-- "decision": Conditional logic (diamond)
-- "end": Exit point (oval shape)  
-- "input": User input (parallelogram)
-- "output": Display output (parallelogram)
+For the visual flowchart:
+- Create a logical flow that represents the code execution
+- Use simple, clear labels (max 3-4 words per node)
+- Position nodes in a top-to-bottom flow with good spacing
+- Use these node types:
+  * "start": Entry point (green oval)
+  * "process": Processing step (blue rectangle) 
+  * "decision": Conditional logic (orange diamond)
+  * "end": Exit point (red oval)
+  * "input": User input (blue parallelogram)
+  * "output": Display output (purple parallelogram)
 
-Position nodes with x,y coordinates for proper layout (0-1000 range).
+Layout guidelines:
+- Start at x=400, y=50
+- Space nodes vertically by 100-150px
+- For parallel paths, offset horizontally by 200-300px
+- Keep x coordinates between 100-700
+- Keep y coordinates between 50-550
+
+Example flow for a simple function:
+Start -> Input -> Process -> Decision -> Output/End
 
 Respond with JSON in this format:
 {
@@ -66,18 +78,35 @@ Respond with JSON in this format:
   "visualFlowchart": {
     "nodes": [
       {
-        "id": "node1",
-        "type": "start",
+        "id": "start",
+        "type": "start", 
         "label": "Start",
-        "x": 500,
+        "x": 400,
         "y": 50
+      },
+      {
+        "id": "process1",
+        "type": "process",
+        "label": "Execute code",
+        "x": 400,
+        "y": 200
+      },
+      {
+        "id": "end",
+        "type": "end",
+        "label": "End",
+        "x": 400,
+        "y": 350
       }
     ],
     "edges": [
       {
-        "from": "node1", 
-        "to": "node2",
-        "label": "next"
+        "from": "start",
+        "to": "process1"
+      },
+      {
+        "from": "process1", 
+        "to": "end"
       }
     ]
   },
