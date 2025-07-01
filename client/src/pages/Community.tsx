@@ -138,11 +138,13 @@ export default function Community() {
   };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Developer Community</h2>
-        <p className="text-gray-600">Share code snippets, get feedback, and learn from other developers.</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+      <AppNavigation />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">Developer Community</h2>
+          <p className="text-gray-300">Share code snippets, get feedback, and learn from other developers.</p>
+        </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Post Creation Panel */}
@@ -300,6 +302,7 @@ export default function Community() {
               ))}
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

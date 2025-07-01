@@ -66,35 +66,36 @@ export default function Visualize() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <AppNavigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Code Visualization</h2>
-        <p className="text-gray-600">Paste your code below to get AI-powered explanations, flowcharts, and line-by-line analysis.</p>
+          <h2 className="text-3xl font-bold text-white mb-2">Code Visualization</h2>
+          <p className="text-gray-300">Paste your code below to get AI-powered explanations, flowcharts, and line-by-line analysis.</p>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Input Panel */}
-        <Card>
+        <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Input Your Code</CardTitle>
+            <CardTitle className="text-white">Input Your Code</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="title">Title (Optional)</Label>
+              <Label htmlFor="title" className="text-gray-300">Title (Optional)</Label>
               <Input
                 id="title"
                 placeholder="Enter a title for your code..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400"
               />
             </div>
 
             <div>
-              <Label htmlFor="language">Programming Language</Label>
+              <Label htmlFor="language" className="text-gray-300">Programming Language</Label>
               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
                   <SelectValue placeholder="Select Language" />
                 </SelectTrigger>
                 <SelectContent>
@@ -112,11 +113,11 @@ export default function Visualize() {
             </div>
 
             <div>
-              <Label htmlFor="code">Your Code</Label>
+              <Label htmlFor="code" className="text-gray-300">Your Code</Label>
               <Textarea
                 id="code"
                 placeholder="Paste your code here..."
-                className="min-h-[300px] font-mono text-sm"
+                className="min-h-[300px] font-mono text-sm bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
               />
@@ -125,18 +126,18 @@ export default function Visualize() {
             <Button 
               onClick={handleAnalyze}
               disabled={!code.trim() || !language || analyzeMutation.isPending}
-              className="w-full"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
             >
-              <i className="fas fa-cogs mr-2"></i>
+              <Workflow className="h-4 w-4 mr-2" />
               {analyzeMutation.isPending ? "Processing..." : "Process Code"}
             </Button>
           </CardContent>
         </Card>
 
         {/* Results Panel */}
-        <Card>
+        <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Analysis Results</CardTitle>
+            <CardTitle className="text-white">Analysis Results</CardTitle>
           </CardHeader>
           <CardContent>
             {analyzeMutation.isPending && (
@@ -144,14 +145,14 @@ export default function Visualize() {
             )}
 
             {analyzeMutation.isError && (
-              <div className="text-center py-8 text-red-500">
+              <div className="text-center py-8 text-red-400">
                 <i className="fas fa-exclamation-triangle text-4xl mb-4"></i>
                 <p>Error analyzing code. Please try again.</p>
               </div>
             )}
 
             {!results && !analyzeMutation.isPending && !analyzeMutation.isError && (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-400">
                 <i className="fas fa-code text-4xl mb-4"></i>
                 <p>Click "Process Code" to analyze your code</p>
               </div>

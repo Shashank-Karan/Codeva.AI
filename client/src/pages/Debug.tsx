@@ -72,15 +72,17 @@ export default function Debug() {
   };
 
   return (
-    <div>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Code Debugger</h2>
-        <p className="text-gray-600">Find and fix issues in your code with AI-powered debugging assistance.</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+      <AppNavigation />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white mb-2">Code Debugger</h2>
+          <p className="text-gray-300">Find and fix issues in your code with AI-powered debugging assistance.</p>
+        </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        {/* Input Panel */}
-        <Card>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* Input Panel */}
+          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Submit Code for Debugging</CardTitle>
           </CardHeader>
@@ -228,6 +230,7 @@ export default function Debug() {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
