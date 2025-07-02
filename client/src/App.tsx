@@ -37,9 +37,9 @@ function Router() {
       ) : (
         <>
           <Route path="/" component={Landing} />
-          <Route path="/visualize" component={Visualize} />
-          <Route path="/community" component={Community} />
-          <Route path="/debug" component={Debug} />
+          <ProtectedRoute path="/visualize" component={Visualize} />
+          <ProtectedRoute path="/community" component={Community} />
+          <ProtectedRoute path="/debug" component={Debug} />
         </>
       )}
       <Route component={NotFound} />

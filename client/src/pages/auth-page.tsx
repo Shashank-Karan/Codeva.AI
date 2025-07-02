@@ -320,8 +320,8 @@ export default function AuthPage() {
                   className="text-blue-400 hover:text-blue-300 text-sm"
                 >
                   {isLogin 
-                    ? "Don't have an account? Sign up" 
-                    : "Already have an account? Sign in"
+                    ? "Don't have an account? Create one here" 
+                    : "Already have an account? Sign in here"
                   }
                 </button>
               </div>

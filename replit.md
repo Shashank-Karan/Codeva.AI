@@ -26,10 +26,12 @@ CodeFlow is a full-stack web application designed for code analysis, visualizati
 ## Key Components
 
 ### Authentication System
-- Replit Auth integration using OpenID Connect
+- Custom username/password authentication
+- Secure password hashing using Node.js crypto (scrypt)
 - Session-based authentication with PostgreSQL storage
-- Middleware for protecting authenticated routes
-- User management with profile information storage
+- Passport.js LocalStrategy for authentication
+- User registration and login forms
+- Protected routes redirecting to auth page
 
 ### Code Analysis Engine
 - **Purpose**: Analyze code snippets and provide detailed explanations
@@ -67,9 +69,9 @@ CodeFlow is a full-stack web application designed for code analysis, visualizati
 ## Data Flow
 
 1. **User Authentication**: 
-   - User logs in via Replit Auth
+   - User creates account or logs in with username/password
    - Session created and stored in PostgreSQL
-   - User profile information synchronized
+   - User profile information stored in database
 
 2. **Code Analysis Flow**:
    - User submits code and language selection
@@ -100,8 +102,9 @@ CodeFlow is a full-stack web application designed for code analysis, visualizati
 - **Connection**: WebSocket-based connection for serverless environments
 
 ### Authentication
-- **Replit Auth**: OpenID Connect provider
+- **Custom Auth**: Username/password authentication system
 - **Session Storage**: PostgreSQL-based session management
+- **Password Security**: Salted password hashing with scrypt
 
 ### UI Libraries
 - **Radix UI**: Accessible component primitives
@@ -128,6 +131,7 @@ CodeFlow is a full-stack web application designed for code analysis, visualizati
 - **SESSION_SECRET**: Session encryption secret
 
 ## Changelog
+- July 02, 2025. Replaced Replit Auth with custom username/password authentication system
 - July 01, 2025. Enhanced app with comprehensive features section, responsive navigation, footer, and interactive animations
 - July 01, 2025. Added "How It Works" section with step-by-step process explanation and interactive code demo
 - July 01, 2025. Implemented responsive mobile navigation with smooth animations and enhanced loading spinner

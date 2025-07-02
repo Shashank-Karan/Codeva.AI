@@ -39,6 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      toast({
+        title: "Welcome back!",
+        description: "Successfully signed in",
+      });
     },
     onError: (error: Error) => {
       toast({
@@ -56,6 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      toast({
+        title: "Account created!",
+        description: "Welcome to CodeFlow. You're now signed in.",
+      });
     },
     onError: (error: Error) => {
       toast({

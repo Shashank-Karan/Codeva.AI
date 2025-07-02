@@ -22,21 +22,13 @@ export default function Landing() {
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-blue-300 hover:text-white transition-colors font-medium">Home</Link>
-            <Link href="/visualize" className="text-gray-300 hover:text-white transition-colors">Visualize</Link>
-            <Link href="/community" className="text-gray-300 hover:text-white transition-colors">Community</Link>
-            <Link href="/debug" className="text-gray-300 hover:text-white transition-colors">Debug Code</Link>
+            <span className="text-blue-300 font-medium">Welcome to CodeFlow</span>
           </div>
           
           <div className="flex items-center space-x-4">
             <Link href="/auth">
-              <Button variant="ghost" className="text-white hover:bg-white/10 hidden sm:inline-flex">
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/auth">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Sign Up
+                Sign In
               </Button>
             </Link>
             <Button variant="ghost" size="sm" className="md:hidden text-white">
