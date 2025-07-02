@@ -1,41 +1,16 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/use-auth";
-import { insertUserSchema } from "@shared/schema";
 import { Redirect } from "wouter";
 import { Code2, Sparkles, Users, Zap } from "lucide-react";
-
-const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
-});
-
-const registerSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
-type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const { user, loginMutation, registerMutation } = useAuth();
 
-  // Simple state-based form instead of react-hook-form
+  // Simple state-based forms
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [registerData, setRegisterData] = useState({
     username: "",
@@ -46,26 +21,6 @@ export default function AuthPage() {
     lastName: "",
   });
 
-  const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
-  });
-
-  const registerForm = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      firstName: "",
-      lastName: "",
-    },
-  });
-
   // Redirect if already logged in
   if (user) {
     return <Redirect to="/" />;
@@ -73,15 +28,32 @@ export default function AuthPage() {
 
   const onLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!loginData.username.trim() || !loginData.password.trim()) {
+      alert("Please fill in all required fields");
+      return;
+    }
     loginMutation.mutate(loginData);
   };
 
   const onRegister = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation
+    if (!registerData.username.trim() || !registerData.email.trim() || !registerData.password.trim()) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
     if (registerData.password !== registerData.confirmPassword) {
       alert("Passwords don't match");
       return;
     }
+
+    if (registerData.password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+
     const { confirmPassword, ...userData } = registerData;
     registerMutation.mutate(userData);
   };
@@ -106,7 +78,7 @@ export default function AuthPage() {
             Analyze, visualize, and debug your code with AI-powered tools. 
             Join our community of developers and enhance your coding journey.
           </p>
-          
+
           <div className="space-y-6">
             <div className="flex items-center space-x-4">
               <div className="bg-blue-600 p-3 rounded-lg">
@@ -117,7 +89,7 @@ export default function AuthPage() {
                 <p className="text-gray-400">Get detailed explanations and flowcharts</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="bg-purple-600 p-3 rounded-lg">
                 <Zap className="h-6 w-6 text-white" />
@@ -127,7 +99,7 @@ export default function AuthPage() {
                 <p className="text-gray-400">Fix issues with AI-powered suggestions</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="bg-green-600 p-3 rounded-lg">
                 <Users className="h-6 w-6 text-white" />
@@ -137,7 +109,7 @@ export default function AuthPage() {
                 <p className="text-gray-400">Share and discover code snippets</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="bg-orange-600 p-3 rounded-lg">
                 <Sparkles className="h-6 w-6 text-white" />
@@ -166,7 +138,7 @@ export default function AuthPage() {
                 }
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent>
               {isLogin ? (
                 <form onSubmit={onLogin} className="space-y-4">
@@ -181,7 +153,7 @@ export default function AuthPage() {
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-gray-300 mb-2">Password</label>
                     <Input 
@@ -193,7 +165,7 @@ export default function AuthPage() {
                       required
                     />
                   </div>
-                  
+
                   <Button 
                     type="submit" 
                     className="w-full bg-blue-600 hover:bg-blue-700"
@@ -204,130 +176,88 @@ export default function AuthPage() {
                 </form>
               ) : (
                 <form onSubmit={onRegister} className="space-y-4">
-                    <FormField
-                      control={registerForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Username</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              className="bg-gray-800 border-gray-700 text-white"
-                              placeholder="Choose a username"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                  <div>
+                    <label className="block text-gray-300 mb-2">Username</label>
+                    <Input 
+                      type="text"
+                      value={registerData.username}
+                      onChange={(e) => handleRegisterChange("username", e.target.value)}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="Choose a username"
+                      required
                     />
-                    
-                    <FormField
-                      control={registerForm.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Email</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="email"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              placeholder="Enter your email"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-300 mb-2">Email</label>
+                    <Input 
+                      type="email"
+                      value={registerData.email}
+                      onChange={(e) => handleRegisterChange("email", e.target.value)}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="Enter your email"
+                      required
                     />
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={registerForm.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-300">First Name</FormLabel>
-                            <FormControl>
-                              <Input 
-                                {...field} 
-                                className="bg-gray-800 border-gray-700 text-white"
-                                placeholder="First name"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={registerForm.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-gray-300">Last Name</FormLabel>
-                            <FormControl>
-                              <Input 
-                                {...field} 
-                                className="bg-gray-800 border-gray-700 text-white"
-                                placeholder="Last name"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-300 mb-2">First Name</label>
+                      <Input 
+                        type="text"
+                        value={registerData.firstName}
+                        onChange={(e) => handleRegisterChange("firstName", e.target.value)}
+                        className="bg-gray-800 border-gray-700 text-white"
+                        placeholder="First name"
                       />
                     </div>
-                    
-                    <FormField
-                      control={registerForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Password</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="password"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              placeholder="Create a password"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+
+                    <div>
+                      <label className="block text-gray-300 mb-2">Last Name</label>
+                      <Input 
+                        type="text"
+                        value={registerData.lastName}
+                        onChange={(e) => handleRegisterChange("lastName", e.target.value)}
+                        className="bg-gray-800 border-gray-700 text-white"
+                        placeholder="Last name"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-300 mb-2">Password</label>
+                    <Input 
+                      type="password"
+                      value={registerData.password}
+                      onChange={(e) => handleRegisterChange("password", e.target.value)}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="Create a password"
+                      required
                     />
-                    
-                    <FormField
-                      control={registerForm.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Confirm Password</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="password"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              placeholder="Confirm your password"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                  </div>
+
+                  <div>
+                    <label className="block text-gray-300 mb-2">Confirm Password</label>
+                    <Input 
+                      type="password"
+                      value={registerData.confirmPassword}
+                      onChange={(e) => handleRegisterChange("confirmPassword", e.target.value)}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="Confirm your password"
+                      required
                     />
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-blue-600 hover:bg-blue-700"
-                      disabled={registerMutation.isPending}
-                    >
-                      {registerMutation.isPending ? "Creating account..." : "Create Account"}
-                    </Button>
-                  </form>
-                </Form>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    disabled={registerMutation.isPending}
+                  >
+                    {registerMutation.isPending ? "Creating account..." : "Create Account"}
+                  </Button>
+                </form>
               )}
-              
+
               <div className="mt-6 text-center">
                 <button
                   onClick={() => setIsLogin(!isLogin)}
