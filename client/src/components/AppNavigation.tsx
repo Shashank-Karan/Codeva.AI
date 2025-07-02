@@ -1,11 +1,33 @@
 import { Button } from "@/components/ui/button";
-import { Code, Users, Bug, Eye, Home, Menu, X } from "lucide-react";
+import { Code, Users, Bug, Eye, Home, Menu, X, LogOut, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AppNavigation() {
   const [location] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, logoutMutation } = useAuth();
+  const { toast } = useToast();
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        toast({
+          title: "Logged out successfully",
+          description: "You have been logged out of your account.",
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Logout failed",
+          description: "There was an error logging out. Please try again.",
+          variant: "destructive",
+        });
+      }
+    });
+  };
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },
@@ -52,6 +74,28 @@ export default function AppNavigation() {
                 </Link>
               );
             })}
+            
+            {/* User Menu */}
+            {user && (
+              <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-slate-700">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="text-gray-300 text-sm">Welcome, {user.username}</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLogout}
+                  disabled={logoutMutation.isPending}
+                  className="text-gray-300 hover:text-white hover:bg-slate-800/60"
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  {logoutMutation.isPending ? "..." : "Logout"}
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -91,6 +135,27 @@ export default function AppNavigation() {
                   </Link>
                 );
               })}
+              
+              {/* Mobile User Menu */}
+              {user && (
+                <div className="border-t border-slate-700 pt-4 mt-4 space-y-2">
+                  <div className="flex items-center space-x-3 px-3 py-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-gray-300 text-sm">Welcome, {user.username}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    onClick={handleLogout}
+                    disabled={logoutMutation.isPending}
+                    className="w-full justify-start space-x-3 py-3 text-gray-300 hover:text-white hover:bg-slate-800/60"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>{logoutMutation.isPending ? "Logging out..." : "Logout"}</span>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         )}

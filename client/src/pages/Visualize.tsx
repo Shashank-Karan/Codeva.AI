@@ -69,10 +69,10 @@ export default function Visualize() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <AppNavigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">Code Visualization</h2>
-          <p className="text-gray-300">Paste your code below to get AI-powered explanations, flowcharts, and line-by-line analysis.</p>
-      </div>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">Code Visualization</h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">Paste your code below to get AI-powered explanations, flowcharts, and line-by-line analysis.</p>
+        </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
         {/* Input Panel */}
@@ -145,16 +145,22 @@ export default function Visualize() {
             )}
 
             {analyzeMutation.isError && (
-              <div className="text-center py-8 text-red-400">
-                <i className="fas fa-exclamation-triangle text-4xl mb-4"></i>
-                <p>Error analyzing code. Please try again.</p>
+              <div className="text-center py-12 px-6">
+                <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-6">
+                  <div className="text-red-400 text-5xl mb-4">⚠️</div>
+                  <h3 className="text-lg font-semibold text-red-400 mb-2">Analysis Failed</h3>
+                  <p className="text-gray-300">There was an error analyzing your code. Please check your input and try again.</p>
+                </div>
               </div>
             )}
 
             {!results && !analyzeMutation.isPending && !analyzeMutation.isError && (
-              <div className="text-center py-8 text-gray-400">
-                <i className="fas fa-code text-4xl mb-4"></i>
-                <p>Click "Process Code" to analyze your code</p>
+              <div className="text-center py-12 px-6">
+                <div className="bg-slate-700/30 border border-slate-600 rounded-lg p-8">
+                  <div className="text-blue-400 text-5xl mb-4">🔍</div>
+                  <h3 className="text-lg font-semibold text-white mb-2">Ready to Analyze</h3>
+                  <p className="text-gray-300">Enter your code and select a programming language, then click "Process Code" to get started.</p>
+                </div>
               </div>
             )}
 
@@ -162,43 +168,45 @@ export default function Visualize() {
               <div className="space-y-6">
                 {/* Code Explanation */}
                 <div>
-                  <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center">
-                    <Lightbulb className="w-5 h-5 text-yellow-500 mr-2" />
+                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                    <Lightbulb className="w-5 h-5 text-yellow-400 mr-2" />
                     Code Explanation
                   </h4>
-                  <div className="bg-gray-50 rounded-md p-4 text-sm text-gray-700">
+                  <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 text-sm text-gray-200">
                     {results.explanation}
                   </div>
                 </div>
 
                 {/* Flowchart */}
                 <div>
-                  <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center">
-                    <GitBranch className="w-5 h-5 text-blue-500 mr-2" />
+                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                    <GitBranch className="w-5 h-5 text-blue-400 mr-2" />
                     Flow Diagram
                   </h4>
                   <Tabs defaultValue="visual" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2">
-                      <TabsTrigger value="visual" className="flex items-center gap-2">
+                    <TabsList className="grid w-full grid-cols-2 bg-slate-700/50 border-slate-600">
+                      <TabsTrigger value="visual" className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                         <Workflow className="w-4 h-4" />
                         Visual Diagram
                       </TabsTrigger>
-                      <TabsTrigger value="text" className="flex items-center gap-2">
+                      <TabsTrigger value="text" className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                         <GitBranch className="w-4 h-4" />
                         Text Flow
                       </TabsTrigger>
                     </TabsList>
                     <TabsContent value="visual" className="mt-4">
                       {results.visualFlowchart ? (
-                        <FlowchartViewer data={results.visualFlowchart} className="w-full" />
+                        <div className="bg-slate-700/30 border border-slate-600 rounded-lg p-4">
+                          <FlowchartViewer data={results.visualFlowchart} className="w-full" />
+                        </div>
                       ) : (
-                        <div className="bg-gray-50 rounded-md p-4 text-center text-gray-500">
+                        <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 text-center text-gray-400">
                           Visual flowchart not available
                         </div>
                       )}
                     </TabsContent>
                     <TabsContent value="text" className="mt-4">
-                      <div className="bg-gray-50 rounded-md p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                      <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 text-sm text-gray-200 whitespace-pre-wrap font-mono">
                         {results.flowchart}
                       </div>
                     </TabsContent>
@@ -207,19 +215,19 @@ export default function Visualize() {
 
                 {/* Line by Line */}
                 <div>
-                  <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center">
-                    <ListOrdered className="w-5 h-5 text-green-500 mr-2" />
+                  <h4 className="text-lg font-semibold text-white mb-3 flex items-center">
+                    <ListOrdered className="w-5 h-5 text-green-400 mr-2" />
                     Line-by-Line Analysis
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {results.lineByLineAnalysis.map((line, index) => (
-                      <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded">
-                        <span className="bg-blue-600 text-white text-xs px-2 py-1 rounded font-mono min-w-[2rem] text-center">
+                      <div key={index} className="flex items-start space-x-3 p-4 bg-slate-700/50 border border-slate-600 rounded-lg">
+                        <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs px-2 py-1 rounded font-mono min-w-[2.5rem] text-center flex-shrink-0">
                           {line.line}
                         </span>
-                        <div className="flex-1">
-                          <code className="text-sm text-gray-800 block mb-1">{line.content}</code>
-                          <p className="text-sm text-gray-600">{line.explanation}</p>
+                        <div className="flex-1 min-w-0">
+                          <code className="text-sm text-blue-300 block mb-2 break-all">{line.content}</code>
+                          <p className="text-sm text-gray-300 leading-relaxed">{line.explanation}</p>
                         </div>
                       </div>
                     ))}
