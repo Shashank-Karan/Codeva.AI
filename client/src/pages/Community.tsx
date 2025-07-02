@@ -141,35 +141,35 @@ export default function Community() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <AppNavigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-white mb-2">Developer Community</h2>
-          <p className="text-gray-300">Share code snippets, get feedback, and learn from other developers.</p>
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">Developer Community</h1>
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">Share code snippets, get feedback, and learn from other developers.</p>
         </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Post Creation Panel */}
         <div className="lg:col-span-1">
-          <Card className="sticky top-24">
+          <Card className="sticky top-24 bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
             <CardHeader>
-              <CardTitle>Create Post</CardTitle>
+              <CardTitle className="text-white">Create Post</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
                 placeholder="What's on your mind? Share a code snippet, ask a question..."
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="min-h-[100px] resize-none"
+                className="min-h-[100px] resize-none bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400"
               />
               
               <Textarea
                 placeholder="Optional: Add code snippet..."
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="min-h-[80px] font-mono text-sm resize-none"
+                className="min-h-[80px] font-mono text-sm resize-none bg-slate-700/50 border-slate-600 text-white placeholder:text-gray-400"
               />
               
               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
                   <SelectValue placeholder="Language (Optional)" />
                 </SelectTrigger>
                 <SelectContent>
@@ -187,17 +187,17 @@ export default function Community() {
               <Button
                 onClick={handleCreatePost}
                 disabled={!content.trim() || createPostMutation.isPending || !!!user}
-                className="w-full"
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
               >
                 <Send className="w-4 h-4 mr-2" />
                 {createPostMutation.isPending ? "Posting..." : "Post"}
               </Button>
               
               {!!!user && (
-                <p className="text-sm text-gray-500 text-center">
+                <p className="text-sm text-gray-400 text-center">
                   <button 
                     onClick={() => window.location.href = "/api/login"}
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-400 hover:text-blue-300 hover:underline"
                   >
                     Sign in
                   </button> to create posts
@@ -212,34 +212,37 @@ export default function Community() {
           {isLoading ? (
             <div className="space-y-6">
               {[...Array(3)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
+                <Card key={i} className="animate-pulse bg-slate-800/40 border-slate-700/50">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-3 mb-4">
-                      <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                      <div className="w-10 h-10 bg-slate-600 rounded-full"></div>
                       <div className="flex-1">
-                        <div className="h-4 bg-gray-300 rounded w-32 mb-2"></div>
-                        <div className="h-3 bg-gray-300 rounded w-20"></div>
+                        <div className="h-4 bg-slate-600 rounded w-32 mb-2"></div>
+                        <div className="h-3 bg-slate-600 rounded w-20"></div>
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <div className="h-4 bg-gray-300 rounded"></div>
-                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                      <div className="h-4 bg-slate-600 rounded"></div>
+                      <div className="h-4 bg-slate-600 rounded w-3/4"></div>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : posts.length === 0 ? (
-            <Card>
-              <CardContent className="p-8 text-center text-gray-500">
-                <MessageCircle className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p>No posts yet. Be the first to share something!</p>
+            <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
+              <CardContent className="p-12 text-center">
+                <div className="bg-slate-700/30 border border-slate-600 rounded-lg p-8">
+                  <div className="text-blue-400 text-5xl mb-4">💬</div>
+                  <h3 className="text-lg font-semibold text-white mb-2">No Posts Yet</h3>
+                  <p className="text-gray-300">Be the first to share something with the community!</p>
+                </div>
               </CardContent>
             </Card>
           ) : (
             <div className="space-y-6">
               {posts.map((post) => (
-                <Card key={post.id}>
+                <Card key={post.id} className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
                   <CardContent className="p-6">
                     <div className="flex items-start space-x-3 mb-4">
                       <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
@@ -247,7 +250,7 @@ export default function Community() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center space-x-2">
-                          <h4 className="font-semibold text-gray-900">
+                          <h4 className="font-semibold text-white">
                             {post.author 
                               ? (post.author.firstName && post.author.lastName 
                                   ? `${post.author.firstName} ${post.author.lastName}`
@@ -256,43 +259,43 @@ export default function Community() {
                               : 'Unknown User'
                             }
                           </h4>
-                          <span className="text-gray-500 text-sm">
+                          <span className="text-gray-400 text-sm">
                             {formatTimeAgo(post.createdAt!)}
                           </span>
                           {post.language && (
-                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                            <span className="bg-blue-600/20 text-blue-300 text-xs px-2 py-1 rounded border border-blue-500/30">
                               {post.language}
                             </span>
                           )}
                         </div>
-                        <p className="text-gray-700 mt-2">{post.content}</p>
+                        <p className="text-gray-200 mt-2">{post.content}</p>
                       </div>
                     </div>
 
                     {post.code && (
-                      <div className="bg-gray-50 rounded-md p-4 mb-4">
-                        <pre className="text-sm font-mono text-gray-800 overflow-x-auto whitespace-pre-wrap">
+                      <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 mb-4">
+                        <pre className="text-sm font-mono text-blue-300 overflow-x-auto whitespace-pre-wrap">
                           {post.code}
                         </pre>
                       </div>
                     )}
 
-                    <div className="flex items-center space-x-6 text-gray-500">
+                    <div className="flex items-center space-x-6 text-gray-400">
                       <button
                         onClick={() => handleLikePost(post)}
                         disabled={likePostMutation.isPending}
-                        className="flex items-center space-x-1 hover:text-red-500 transition duration-200"
+                        className="flex items-center space-x-1 hover:text-red-400 transition duration-200"
                       >
                         <Heart 
                           className={`w-4 h-4 ${post.isLiked ? 'fill-red-500 text-red-500' : ''}`}
                         />
                         <span>{post.likes || 0}</span>
                       </button>
-                      <button className="flex items-center space-x-1 hover:text-blue-500 transition duration-200">
+                      <button className="flex items-center space-x-1 hover:text-blue-400 transition duration-200">
                         <MessageCircle className="w-4 h-4" />
                         <span>{post.commentsCount || 0}</span>
                       </button>
-                      <button className="flex items-center space-x-1 hover:text-green-500 transition duration-200">
+                      <button className="flex items-center space-x-1 hover:text-green-400 transition duration-200">
                         <Share2 className="w-4 h-4" />
                         <span>Share</span>
                       </button>
