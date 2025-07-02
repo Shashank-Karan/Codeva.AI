@@ -24,10 +24,12 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table for Replit Auth
+// User storage table
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().notNull(),
-  email: varchar("email").unique(),
+  id: serial("id").primaryKey(),
+  username: varchar("username", { length: 50 }).unique().notNull(),
+  email: varchar("email").unique().notNull(),
+  password: varchar("password").notNull(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
@@ -38,7 +40,7 @@ export const users = pgTable("users", {
 // Community posts table
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
-  authorId: varchar("author_id").notNull().references(() => users.id),
+  authorId: integer("author_id").notNull().references(() => users.id),
   content: text("content").notNull(),
   code: text("code"),
   language: varchar("language"),
@@ -52,14 +54,14 @@ export const posts = pgTable("posts", {
 export const postLikes = pgTable("post_likes", {
   id: serial("id").primaryKey(),
   postId: integer("post_id").notNull().references(() => posts.id),
-  userId: varchar("user_id").notNull().references(() => users.id),
+  userId: integer("user_id").notNull().references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Code analysis results table
 export const codeAnalysis = pgTable("code_analysis", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: integer("user_id").references(() => users.id),
   title: varchar("title"),
   code: text("code").notNull(),
   language: varchar("language").notNull(),
@@ -72,7 +74,7 @@ export const codeAnalysis = pgTable("code_analysis", {
 // Debug results table
 export const debugResults = pgTable("debug_results", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: integer("user_id").references(() => users.id),
   originalCode: text("original_code").notNull(),
   language: varchar("language").notNull(),
   issues: jsonb("issues"),
@@ -126,9 +128,21 @@ export const insertDebugSchema = createInsertSchema(debugResults).pick({
   language: true,
 });
 
+export const insertUserSchema = createInsertSchema(users).pick({
+  username: true,
+  email: true,
+  password: true,
+  firstName: true,
+  lastName: true,
+}).extend({
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Post = typeof posts.$inferSelect;
 export type PostWithAuthor = Post & { author: User | null; isLiked?: boolean };
 export type InsertPost = z.infer<typeof insertPostSchema>;

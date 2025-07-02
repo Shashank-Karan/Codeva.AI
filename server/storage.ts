@@ -18,8 +18,11 @@ import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
-  // User operations (mandatory for Replit Auth)
+  // User operations
   getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: UpsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   
   // Post operations
@@ -40,7 +43,22 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await db.select().from(users).where(eq(users.id, parseInt(id)));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(userData).returning();
     return user;
   }
 
@@ -65,7 +83,7 @@ export class DatabaseStorage implements IStorage {
       .insert(posts)
       .values({
         ...post,
-        authorId,
+        authorId: parseInt(authorId),
       })
       .returning();
     return newPost;
@@ -106,7 +124,7 @@ export class DatabaseStorage implements IStorage {
   async likePost(postId: number, userId: string): Promise<void> {
     await db.transaction(async (tx) => {
       // Insert like
-      await tx.insert(postLikes).values({ postId, userId }).onConflictDoNothing();
+      await tx.insert(postLikes).values({ postId, userId: parseInt(userId) }).onConflictDoNothing();
       
       // Update like count
       await tx
@@ -137,7 +155,7 @@ export class DatabaseStorage implements IStorage {
       .insert(codeAnalysis)
       .values({
         ...analysisData,
-        userId,
+        userId: userId ? parseInt(userId) : null,
         explanation: results.explanation,
         flowchart: results.flowchart,
         lineByLineAnalysis: results.lineByLineAnalysis,
@@ -150,7 +168,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(codeAnalysis)
-      .where(eq(codeAnalysis.userId, userId))
+      .where(eq(codeAnalysis.userId, parseInt(userId)))
       .orderBy(desc(codeAnalysis.createdAt));
   }
 
@@ -160,7 +178,7 @@ export class DatabaseStorage implements IStorage {
       .insert(debugResults)
       .values({
         ...request,
-        userId,
+        userId: userId ? parseInt(userId) : null,
         issues: results.issues,
         fixedCode: results.fixedCode,
         explanation: results.explanation,
@@ -173,7 +191,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(debugResults)
-      .where(eq(debugResults.userId, userId))
+      .where(eq(debugResults.userId, parseInt(userId)))
       .orderBy(desc(debugResults.createdAt));
   }
 }

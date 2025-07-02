@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Heart, MessageCircle, Share2, Send } from "lucide-react";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -16,7 +16,7 @@ export default function Community() {
   const [content, setContent] = useState("");
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState("");
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -101,7 +101,7 @@ export default function Community() {
   };
 
   const handleLikePost = (post: PostWithAuthor) => {
-    if (!isAuthenticated) {
+    if (!!!user) {
       window.location.href = "/api/login";
       return;
     }
@@ -186,14 +186,14 @@ export default function Community() {
 
               <Button
                 onClick={handleCreatePost}
-                disabled={!content.trim() || createPostMutation.isPending || !isAuthenticated}
+                disabled={!content.trim() || createPostMutation.isPending || !!!user}
                 className="w-full"
               >
                 <Send className="w-4 h-4 mr-2" />
                 {createPostMutation.isPending ? "Posting..." : "Post"}
               </Button>
               
-              {!isAuthenticated && (
+              {!!!user && (
                 <p className="text-sm text-gray-500 text-center">
                   <button 
                     onClick={() => window.location.href = "/api/login"}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 
 interface NavigationProps {
   activeSection: string;
@@ -10,7 +10,7 @@ interface NavigationProps {
 
 export default function Navigation({ activeSection, onSectionChange }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
 
   const navItems = [
     { id: "visualize", label: "Visualize", icon: "fas fa-code" },
@@ -50,7 +50,7 @@ export default function Navigation({ activeSection, onSectionChange }: Navigatio
                 </button>
               ))}
               
-              {isAuthenticated ? (
+              {user ? (
                 <div className="flex items-center space-x-3">
                   <span className="text-sm text-gray-600">
                     Welcome, {user?.firstName || user?.email}
@@ -110,7 +110,7 @@ export default function Navigation({ activeSection, onSectionChange }: Navigatio
             ))}
             
             <div className="border-t border-gray-200 pt-3">
-              {isAuthenticated ? (
+              {user ? (
                 <Button
                   variant="outline"
                   size="sm"

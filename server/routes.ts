@@ -1,30 +1,26 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth } from "./auth";
 import { analyzeCode, debugCode } from "./services/gemini";
 import { insertPostSchema, insertCodeAnalysisSchema, insertDebugSchema } from "@shared/schema";
 
+// Simple auth middleware
+function isAuthenticated(req: any, res: any, next: any) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: "Unauthorized" });
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
-  await setupAuth(app);
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  setupAuth(app);
 
   // Code analysis routes
   app.post('/api/analyze', async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.user?.id?.toString();
       const analysisData = insertCodeAnalysisSchema.parse(req.body);
       
       const results = await analyzeCode(analysisData.code, analysisData.language);
@@ -39,7 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/analyze/history', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id.toString();
       const analyses = await storage.getUserCodeAnalyses(userId);
       res.json(analyses);
     } catch (error) {
@@ -51,7 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Debug routes
   app.post('/api/debug', async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.user?.id?.toString();
       const debugData = insertDebugSchema.parse(req.body);
       
       const results = await debugCode(debugData.originalCode, debugData.language);
@@ -66,7 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/debug/history', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id.toString();
       const debugResults = await storage.getUserDebugResults(userId);
       res.json(debugResults);
     } catch (error) {
@@ -78,7 +74,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Community routes
   app.post('/api/posts', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id.toString();
       const postData = insertPostSchema.parse(req.body);
       
       const post = await storage.createPost(userId, postData);
@@ -91,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/posts', async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.user?.id?.toString();
       const posts = await storage.getPosts(userId);
       res.json(posts);
     } catch (error) {
@@ -102,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/posts/:id/like', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id.toString();
       const postId = parseInt(req.params.id);
       
       await storage.likePost(postId, userId);
@@ -115,7 +111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete('/api/posts/:id/like', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id.toString();
       const postId = parseInt(req.params.id);
       
       await storage.unlikePost(postId, userId);
