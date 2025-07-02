@@ -16,8 +16,13 @@ const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-const registerSchema = insertUserSchema.extend({
+const registerSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -29,6 +34,17 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const { user, loginMutation, registerMutation } = useAuth();
+
+  // Simple state-based form instead of react-hook-form
+  const [loginData, setLoginData] = useState({ username: "", password: "" });
+  const [registerData, setRegisterData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: "",
+  });
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -45,8 +61,8 @@ export default function AuthPage() {
       email: "",
       password: "",
       confirmPassword: "",
-      firstName: undefined,
-      lastName: undefined,
+      firstName: "",
+      lastName: "",
     },
   });
 
@@ -55,13 +71,27 @@ export default function AuthPage() {
     return <Redirect to="/" />;
   }
 
-  const onLogin = (data: LoginFormData) => {
-    loginMutation.mutate(data);
+  const onLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    loginMutation.mutate(loginData);
   };
 
-  const onRegister = (data: RegisterFormData) => {
-    const { confirmPassword, ...userData } = data;
+  const onRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (registerData.password !== registerData.confirmPassword) {
+      alert("Passwords don't match");
+      return;
+    }
+    const { confirmPassword, ...userData } = registerData;
     registerMutation.mutate(userData);
+  };
+
+  const handleLoginChange = (field: string, value: string) => {
+    setLoginData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleRegisterChange = (field: string, value: string) => {
+    setRegisterData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -139,57 +169,41 @@ export default function AuthPage() {
             
             <CardContent>
               {isLogin ? (
-                <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
-                    <FormField
-                      control={loginForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Username</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              className="bg-gray-800 border-gray-700 text-white"
-                              placeholder="Enter your username"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                <form onSubmit={onLogin} className="space-y-4">
+                  <div>
+                    <label className="block text-gray-300 mb-2">Username</label>
+                    <Input 
+                      type="text"
+                      value={loginData.username}
+                      onChange={(e) => handleLoginChange("username", e.target.value)}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="Enter your username"
+                      required
                     />
-                    
-                    <FormField
-                      control={loginForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-gray-300">Password</FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="password"
-                              className="bg-gray-800 border-gray-700 text-white"
-                              placeholder="Enter your password"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-gray-300 mb-2">Password</label>
+                    <Input 
+                      type="password"
+                      value={loginData.password}
+                      onChange={(e) => handleLoginChange("password", e.target.value)}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="Enter your password"
+                      required
                     />
-                    
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-blue-600 hover:bg-blue-700"
-                      disabled={loginMutation.isPending}
-                    >
-                      {loginMutation.isPending ? "Signing in..." : "Sign In"}
-                    </Button>
-                  </form>
-                </Form>
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    disabled={loginMutation.isPending}
+                  >
+                    {loginMutation.isPending ? "Signing in..." : "Sign In"}
+                  </Button>
+                </form>
               ) : (
-                <Form {...registerForm}>
-                  <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
+                <form onSubmit={onRegister} className="space-y-4">
                     <FormField
                       control={registerForm.control}
                       name="username"

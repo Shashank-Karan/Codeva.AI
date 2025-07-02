@@ -10,7 +10,8 @@ import Home from "@/pages/Home";
 import Visualize from "@/pages/Visualize";
 import Community from "@/pages/Community";
 import Debug from "@/pages/Debug";
-import AuthPage from "@/pages/auth-page";
+import AuthPageSimple from "@/pages/auth-page-simple";
+import SimpleAuthTest from "@/pages/simple-auth-test";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -26,7 +27,8 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/auth" component={AuthPage} />
+      <Route path="/auth" component={AuthPageSimple} />
+      <Route path="/test-auth" component={SimpleAuthTest} />
       {user ? (
         <>
           <Route path="/" component={Home} />
