@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { Heart, MessageCircle, Share2, Send } from "lucide-react";
+import { Heart, MessageCircle, Share2, Send, ImageIcon, Video, X } from "lucide-react";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import AppNavigation from "@/components/AppNavigation";
 import type { PostWithAuthor } from "@shared/schema";
@@ -16,6 +16,12 @@ export default function Community() {
   const [content, setContent] = useState("");
   const [code, setCode] = useState("");
   const [language, setLanguage] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [videoPreview, setVideoPreview] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -23,7 +29,18 @@ export default function Community() {
   const { data: posts = [], isLoading } = useQuery<PostWithAuthor[]>({
     queryKey: ["/api/posts"],
     retry: false,
+    refetchInterval: 5000, // Refetch every 5 seconds for real-time updates
+    refetchIntervalInBackground: true,
   });
+
+  // Auto-refresh effect for better real-time experience
+  useEffect(() => {
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [queryClient]);
 
   const createPostMutation = useMutation({
     mutationFn: async (data: { content: string; code?: string; language?: string }) => {
@@ -33,6 +50,8 @@ export default function Community() {
       setContent("");
       setCode("");
       setLanguage("");
+      removeImage();
+      removeVideo();
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
       toast({
         title: "Success",
@@ -90,13 +109,58 @@ export default function Community() {
     },
   });
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onload = () => setImagePreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('video/')) {
+      setSelectedVideo(file);
+      const reader = new FileReader();
+      reader.onload = () => setVideoPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImagePreview("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const removeVideo = () => {
+    setSelectedVideo(null);
+    setVideoPreview("");
+    if (videoInputRef.current) {
+      videoInputRef.current.value = "";
+    }
+  };
+
   const handleCreatePost = () => {
-    if (!content.trim()) return;
+    if (!content.trim() && !selectedImage && !selectedVideo) return;
+    
+    const formData = new FormData();
+    formData.append('content', content.trim());
+    if (code.trim()) formData.append('code', code.trim());
+    if (language && language !== "none") formData.append('language', language);
+    if (selectedImage) formData.append('image', selectedImage);
+    if (selectedVideo) formData.append('video', selectedVideo);
     
     createPostMutation.mutate({
       content: content.trim(),
       code: code.trim() || undefined,
       language: (language && language !== "none") ? language : undefined,
+      image: selectedImage ? imagePreview : undefined,
+      video: selectedVideo ? videoPreview : undefined,
     });
   };
 
@@ -184,9 +248,87 @@ export default function Community() {
                 </SelectContent>
               </Select>
 
+              {/* Media Upload Section */}
+              <div className="flex gap-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  className="hidden"
+                />
+                <input
+                  ref={videoInputRef}
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoSelect}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="bg-slate-700/50 border-slate-600 text-white hover:bg-slate-600/50"
+                >
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Image
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => videoInputRef.current?.click()}
+                  className="bg-slate-700/50 border-slate-600 text-white hover:bg-slate-600/50"
+                >
+                  <Video className="w-4 h-4 mr-2" />
+                  Video
+                </Button>
+              </div>
+
+              {/* Image Preview */}
+              {imagePreview && (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="max-h-48 rounded-lg border border-slate-600"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+
+              {/* Video Preview */}
+              {videoPreview && (
+                <div className="relative">
+                  <video
+                    src={videoPreview}
+                    controls
+                    className="max-h-48 rounded-lg border border-slate-600"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={removeVideo}
+                    className="absolute top-2 right-2"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+
               <Button
                 onClick={handleCreatePost}
-                disabled={!content.trim() || createPostMutation.isPending || !!!user}
+                disabled={(!content.trim() && !selectedImage && !selectedVideo) || createPostMutation.isPending || !!!user}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
               >
                 <Send className="w-4 h-4 mr-2" />
@@ -277,6 +419,27 @@ export default function Community() {
                         <pre className="text-sm font-mono text-blue-300 overflow-x-auto whitespace-pre-wrap">
                           {post.code}
                         </pre>
+                      </div>
+                    )}
+
+                    {/* Display post media */}
+                    {(post as any).image && (
+                      <div className="mb-4">
+                        <img
+                          src={(post as any).image}
+                          alt="Post image"
+                          className="max-w-full h-auto rounded-lg border border-slate-600"
+                        />
+                      </div>
+                    )}
+
+                    {(post as any).video && (
+                      <div className="mb-4">
+                        <video
+                          src={(post as any).video}
+                          controls
+                          className="max-w-full h-auto rounded-lg border border-slate-600"
+                        />
                       </div>
                     )}
 

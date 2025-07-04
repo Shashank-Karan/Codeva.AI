@@ -96,6 +96,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.id.toString();
       const postData = insertPostSchema.parse(req.body);
       
+      // Validate that at least content, image, or video is provided
+      if (!postData.content?.trim() && !postData.image && !postData.video) {
+        return res.status(400).json({ message: "Post must have content, image, or video" });
+      }
+      
       const post = await storage.createPost(userId, postData);
       res.json(post);
     } catch (error) {

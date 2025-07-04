@@ -41,9 +41,11 @@ export const users = pgTable("users", {
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
   authorId: integer("author_id").notNull().references(() => users.id),
-  content: text("content").notNull(),
+  content: text("content"),
   code: text("code"),
   language: varchar("language"),
+  image: text("image"), // Base64 encoded image or URL
+  video: text("video"), // Base64 encoded video or URL
   likes: integer("likes").default(0),
   commentsCount: integer("comments_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
@@ -115,6 +117,10 @@ export const insertPostSchema = createInsertSchema(posts).pick({
   content: true,
   code: true,
   language: true,
+  image: true,
+  video: true,
+}).extend({
+  content: z.string().optional(),
 });
 
 export const insertCodeAnalysisSchema = createInsertSchema(codeAnalysis).pick({
