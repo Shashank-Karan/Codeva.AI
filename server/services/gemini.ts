@@ -267,3 +267,28 @@ Respond with JSON in this format:
     throw new Error(`Failed to debug code: ${error}`);
   }
 }
+
+export async function chatWithAI(message: string, fileContent?: string, fileType?: string): Promise<string> {
+  try {
+    let prompt = message;
+    
+    if (fileContent) {
+      const fileTypeText = fileType ? ` (${fileType})` : '';
+      prompt = `User has shared a file${fileTypeText} and asks: "${message}"\n\nFile content:\n${fileContent}\n\nPlease provide a helpful and detailed response based on the file content and the user's question.`;
+    }
+
+    const systemPrompt = `You are a helpful AI assistant. You can analyze files, answer questions about code, documents, PDFs, and provide detailed explanations. Always be helpful, accurate, and provide practical advice. If you're analyzing code, explain it clearly. If it's a document or PDF, summarize key points and answer specific questions about it.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-pro",
+      config: {
+        systemInstruction: systemPrompt,
+      },
+      contents: prompt,
+    });
+
+    return response.text || "Sorry, I couldn't generate a response.";
+  } catch (error) {
+    throw new Error(`Failed to get AI response: ${error}`);
+  }
+}

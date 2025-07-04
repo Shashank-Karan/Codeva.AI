@@ -60,6 +60,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Chat route for file/text analysis
+  app.post('/api/chat', async (req: any, res) => {
+    try {
+      const { message, fileContent, fileType } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      const { chatWithAI } = await import('./services/gemini');
+      const response = await chatWithAI(message, fileContent, fileType);
+      
+      res.json({ response });
+    } catch (error) {
+      console.error("Error in AI chat:", error);
+      res.status(500).json({ message: "Failed to get AI response" });
+    }
+  });
+
   app.get('/api/debug/history', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.id.toString();

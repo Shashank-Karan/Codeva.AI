@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Code, Users, Bug, Eye, Home, Menu, X, LogOut, User } from "lucide-react";
+import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -7,9 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function AppNavigation() {
   const [location] = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
@@ -32,8 +32,9 @@ export default function AppNavigation() {
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/visualize", label: "Visualize", icon: Eye },
-    { href: "/community", label: "Community", icon: Users },
     { href: "/debug", label: "Debug", icon: Bug },
+    { href: "/chat", label: "Chat", icon: MessageCircle },
+    { href: "/community", label: "Community", icon: Users },
   ];
 
   return (
