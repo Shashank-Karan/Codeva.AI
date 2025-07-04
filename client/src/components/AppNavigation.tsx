@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User } from "lucide-react";
+import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User, Code } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
