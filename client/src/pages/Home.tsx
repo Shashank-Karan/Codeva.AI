@@ -47,7 +47,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/community">
-              <Button size="lg" variant="outline" className="border-gray-400/30 text-gray-200 hover:bg-white/10 px-8 py-4 text-lg backdrop-blur-sm">
+              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
                 <Users className="h-5 w-5 mr-2" />
                 Explore Community
               </Button>
