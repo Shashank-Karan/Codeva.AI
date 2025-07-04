@@ -10,7 +10,7 @@ export default function Landing() {
       <div className="absolute inset-0 opacity-20">
         <div className="h-full w-full bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
       </div>
-      
+
       {/* Navigation */}
       <nav className="relative z-50 p-4 lg:p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -20,11 +20,11 @@ export default function Landing() {
             </div>
             <span className="text-2xl font-bold text-white">CodeVis.ai</span>
           </div>
-          
+
           <div className="hidden md:flex items-center space-x-8">
             <span className="text-blue-300 font-medium">Welcome to CodeFlow</span>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <Link href="/auth">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white">
@@ -46,7 +46,7 @@ export default function Landing() {
             <div className="h-2 w-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
             AI-Powered Code Analysis
           </div>
-          
+
           {/* Main heading */}
           <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Visualize Code
@@ -55,13 +55,13 @@ export default function Landing() {
               Like Never Before
             </span>
           </h1>
-          
+
           {/* Subtitle */}
           <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
             Transform complex code into interactive visualizations with step-by-step explanations, 
             live variable tracking, and intelligent flowcharts powered by AI.
           </p>
-          
+
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/visualize">

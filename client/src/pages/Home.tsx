@@ -11,7 +11,7 @@ export default function Home() {
       <div className="absolute inset-0 opacity-20">
         <div className="h-full w-full bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
       </div>
-      
+
       <AppNavigation />
 
       {/* Hero Section */}
@@ -22,7 +22,7 @@ export default function Home() {
             <div className="h-2 w-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
             AI-Powered Code Analysis
           </div>
-          
+
           {/* Main heading */}
           <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Visualize Code
@@ -31,13 +31,13 @@ export default function Home() {
               Like Never Before
             </span>
           </h1>
-          
+
           {/* Subtitle */}
           <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
             Transform complex code into interactive visualizations with step-by-step explanations, 
             live variable tracking, and intelligent flowcharts powered by AI.
           </p>
-          
+
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/visualize">
@@ -312,7 +312,7 @@ export default function Home() {
                 <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
                   <Code className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-2xl font-bold text-white">CodeVis.ai</span>
+                <span className="text-2xl font-bold text-white">Codeva.AI</span>
               </div>
               <p className="text-gray-400 max-w-md">
                 Empowering developers worldwide with AI-driven code visualization, debugging, and collaborative learning tools.

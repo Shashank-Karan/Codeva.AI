@@ -1,8 +1,8 @@
-# CodeFlow Application
+# Codeva.AI Application
 
 ## Overview
 
-CodeFlow is a full-stack web application designed for code analysis, visualization, and community interaction. It's built as a modern React application with Express.js backend, featuring AI-powered code analysis using Google's Gemini AI, community features for sharing code snippets, and debugging capabilities.
+Codeva.AI is a full-stack web application designed for code analysis, visualization, and community interaction. It's built as a modern React application with Express.js backend, featuring AI-powered code analysis using Google's Gemini AI, community features for sharing code snippets, and debugging capabilities.
 
 ## System Architecture
 

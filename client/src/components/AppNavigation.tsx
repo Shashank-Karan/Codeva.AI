@@ -45,15 +45,15 @@ export default function AppNavigation() {
             <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
               <Code className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors duration-200">CodeVis.ai</span>
+            <span className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors duration-200">Codeva.AI</span>
           </Link>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {navItems.map((item) => {
               const isActive = location === item.href;
               const Icon = item.icon;
-              
+
               return (
                 <Link key={item.href} href={item.href}>
                   <Button
@@ -74,7 +74,7 @@ export default function AppNavigation() {
                 </Link>
               );
             })}
-            
+
             {/* User Menu */}
             {user && (
               <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-slate-700">
@@ -118,7 +118,7 @@ export default function AppNavigation() {
               {navItems.map((item) => {
                 const isActive = location === item.href;
                 const Icon = item.icon;
-                
+
                 return (
                   <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)}>
                     <Button
@@ -135,7 +135,7 @@ export default function AppNavigation() {
                   </Link>
                 );
               })}
-              
+
               {/* Mobile User Menu */}
               {user && (
                 <div className="border-t border-slate-700 pt-4 mt-4 space-y-2">

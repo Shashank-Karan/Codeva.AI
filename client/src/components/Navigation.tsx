@@ -29,7 +29,7 @@ export default function Navigation({ activeSection, onSectionChange }: Navigatio
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-blue-600">CodeFlow</h1>
+            <h1 className="text-2xl font-bold text-blue-600">Codeva.AI</h1>
           </div>
 
           {/* Desktop Navigation */}
@@ -49,7 +49,7 @@ export default function Navigation({ activeSection, onSectionChange }: Navigatio
                   {item.label}
                 </button>
               ))}
-              
+
               {user ? (
                 <div className="flex items-center space-x-3">
                   <span className="text-sm text-gray-600">
@@ -108,7 +108,7 @@ export default function Navigation({ activeSection, onSectionChange }: Navigatio
                 {item.label}
               </button>
             ))}
-            
+
             <div className="border-t border-gray-200 pt-3">
               {user ? (
                 <Button
