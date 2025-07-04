@@ -43,7 +43,7 @@ export default function Community() {
   }, [queryClient]);
 
   const createPostMutation = useMutation({
-    mutationFn: async (data: { content: string; code?: string; language?: string }) => {
+    mutationFn: async (data: { content: string; code?: string; language?: string; image?: string; video?: string }) => {
       await apiRequest("POST", "/api/posts", data);
     },
     onSuccess: () => {
@@ -147,13 +147,6 @@ export default function Community() {
 
   const handleCreatePost = () => {
     if (!content.trim() && !selectedImage && !selectedVideo) return;
-    
-    const formData = new FormData();
-    formData.append('content', content.trim());
-    if (code.trim()) formData.append('code', code.trim());
-    if (language && language !== "none") formData.append('language', language);
-    if (selectedImage) formData.append('image', selectedImage);
-    if (selectedVideo) formData.append('video', selectedVideo);
     
     createPostMutation.mutate({
       content: content.trim(),

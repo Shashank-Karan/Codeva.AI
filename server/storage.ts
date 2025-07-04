@@ -97,6 +97,8 @@ export class DatabaseStorage implements IStorage {
         content: posts.content,
         code: posts.code,
         language: posts.language,
+        image: posts.image,
+        video: posts.video,
         likes: posts.likes,
         commentsCount: posts.commentsCount,
         createdAt: posts.createdAt,
