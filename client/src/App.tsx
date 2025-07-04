@@ -9,7 +9,7 @@ import Landing from "@/pages/Landing";
 import Home from "./pages/Home";
 import Visualize from "./pages/Visualize";
 import Debug from "./pages/Debug";
-import Chat from "./pages/Chat";
+import Chat from "./pages/ChatSimple";
 import Community from "./pages/Community";
 import AuthPageSimple from "@/pages/auth-page-simple";
 import SimpleAuthTest from "@/pages/simple-auth-test";
@@ -35,22 +35,32 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/visualize" component={Visualize} />
           <Route path="/debug" component={Debug} />
-          <Route path="/chat">
-            <ProtectedRoute>
-              <Chat />
-            </ProtectedRoute>
-          </Route>
+          <Route path="/chat" component={Chat} />
           <Route path="/community" component={Community} />
         </>
       ) : (
         <>
           <Route path="/" component={Landing} />
-          <ProtectedRoute path="/visualize" component={Visualize} />
-          <ProtectedRoute path="/debug" component={Debug} />
-          <ProtectedRoute path="/chat">
-            <Chat />
-          </ProtectedRoute>
-          <ProtectedRoute path="/community" component={Community} />
+          <Route path="/visualize">
+            <ProtectedRoute>
+              <Visualize />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/debug">
+            <ProtectedRoute>
+              <Debug />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/chat">
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/community">
+            <ProtectedRoute>
+              <Community />
+            </ProtectedRoute>
+          </Route>
         </>
       )}
       <Route component={NotFound} />
