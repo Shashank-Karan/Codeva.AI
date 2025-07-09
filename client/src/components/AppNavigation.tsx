@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User, Code, Crown } from "lucide-react";
+import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User, Code, Crown, Gamepad2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -36,6 +36,7 @@ export default function AppNavigation() {
     { href: "/chat", label: "Chat", icon: MessageCircle },
     { href: "/community", label: "Community", icon: Users },
     { href: "/chess", label: "Chess", icon: Crown },
+    { href: "/games", label: "Games", icon: Gamepad2 },
   ];
 
   return (

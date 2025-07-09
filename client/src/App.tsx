@@ -13,6 +13,7 @@ import Chat from "./pages/ChatSimple";
 import Community from "./pages/Community";
 import Chess from "./pages/Chess";
 import ChessGame from "./pages/ChessGame";
+import Games from "./pages/Games";
 import AuthPageSimple from "@/pages/auth-page-simple";
 import SimpleAuthTest from "@/pages/simple-auth-test";
 import NotFound from "@/pages/not-found";
@@ -41,6 +42,7 @@ function Router() {
           <Route path="/community" component={Community} />
           <Route path="/chess" component={Chess} />
           <Route path="/chess/game/:roomId" component={ChessGame} />
+          <Route path="/games" component={Games} />
 
         </>
       ) : (
@@ -74,6 +76,11 @@ function Router() {
           <Route path="/chess/game/:roomId">
             <ProtectedRoute>
               <ChessGame />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/games">
+            <ProtectedRoute>
+              <Games />
             </ProtectedRoute>
           </Route>
         </>
