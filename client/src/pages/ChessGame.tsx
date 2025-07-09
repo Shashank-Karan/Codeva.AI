@@ -63,6 +63,7 @@ export default function ChessGame() {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [possibleMoves, setPossibleMoves] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [capturedPieces, setCapturedPieces] = useState<{white: string[], black: string[]}>({white: [], black: []});
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch initial game data
@@ -70,6 +71,13 @@ export default function ChessGame() {
     queryKey: [`/api/chess/games/${roomId}`],
     enabled: !!roomId,
   });
+
+  // Initialize captured pieces when game data loads
+  useEffect(() => {
+    if (gameData?.currentFen) {
+      updateCapturedPieces(gameData.currentFen);
+    }
+  }, [gameData?.currentFen]);
 
   // Initialize socket connection
   useEffect(() => {
@@ -94,6 +102,7 @@ export default function ChessGame() {
       chess.load(state.fen);
       setSelectedSquare(null);
       setPossibleMoves([]);
+      updateCapturedPieces(state.fen);
     });
 
     newSocket.on('chat-history', (messages: ChatMessage[]) => {
@@ -106,6 +115,7 @@ export default function ChessGame() {
       setGameState(prev => prev ? { ...prev, ...data } : data);
       setSelectedSquare(null);
       setPossibleMoves([]);
+      updateCapturedPieces(data.fen);
     });
 
     newSocket.on('ai-move-made', (data: any) => {
@@ -258,6 +268,75 @@ export default function ChessGame() {
            (gameState.turn === 'b' && gameData.blackPlayer?.id === user.id);
   };
 
+  const updateCapturedPieces = (fen: string) => {
+    const startingPieces = {
+      'p': 8, 'r': 2, 'n': 2, 'b': 2, 'q': 1, 'k': 1,
+      'P': 8, 'R': 2, 'N': 2, 'B': 2, 'Q': 1, 'K': 1
+    };
+    
+    const currentPieces: any = {};
+    
+    // Count current pieces on board
+    const board = fen.split(' ')[0];
+    for (const char of board) {
+      if (char in startingPieces) {
+        currentPieces[char] = (currentPieces[char] || 0) + 1;
+      }
+    }
+    
+    const captured = { white: [] as string[], black: [] as string[] };
+    
+    // Calculate captured pieces
+    for (const [piece, startCount] of Object.entries(startingPieces)) {
+      const currentCount = currentPieces[piece] || 0;
+      const capturedCount = startCount - currentCount;
+      
+      for (let i = 0; i < capturedCount; i++) {
+        if (piece === piece.toLowerCase()) {
+          // Black piece captured by white
+          captured.white.push(piece);
+        } else {
+          // White piece captured by black
+          captured.black.push(piece.toLowerCase());
+        }
+      }
+    }
+    
+    setCapturedPieces(captured);
+  };
+
+  const getPlayerResult = () => {
+    if (!gameState || !user || !gameData || gameState.gameStatus !== 'finished') return null;
+    
+    const isWhitePlayer = gameData.whitePlayer?.id === user.id;
+    const isBlackPlayer = gameData.blackPlayer?.id === user.id;
+    
+    if (gameState.winner === 'draw') return 'draw';
+    if ((gameState.winner === 'white' && isWhitePlayer) || (gameState.winner === 'black' && isBlackPlayer)) {
+      return 'winner';
+    }
+    if ((gameState.winner === 'white' && isBlackPlayer) || (gameState.winner === 'black' && isWhitePlayer)) {
+      return 'loser';
+    }
+    return null;
+  };
+
+  const renderCapturedPieces = (pieces: string[], color: 'white' | 'black') => {
+    const pieceSymbols: { [key: string]: string } = {
+      'p': '♟', 'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚'
+    };
+    
+    return (
+      <div className={`flex flex-wrap gap-1 min-h-[24px] p-2 rounded ${color === 'white' ? 'bg-slate-100/10' : 'bg-slate-700/50'}`}>
+        {pieces.map((piece, index) => (
+          <span key={index} className="text-lg">
+            {pieceSymbols[piece]}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 flex items-center justify-center">
@@ -351,18 +430,53 @@ export default function ChessGame() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  {/* Black player info */}
-                  <div className="bg-slate-700/50 rounded-lg p-3">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 bg-slate-900 rounded-full"></div>
-                      <span className="text-white font-medium text-sm sm:text-base">
-                        {gameData.blackPlayer?.username || 'Waiting...'}
-                      </span>
+                {/* Game Result Banner */}
+                {getPlayerResult() && (
+                  <div className={`mb-6 p-4 rounded-lg text-center ${
+                    getPlayerResult() === 'winner' ? 'bg-green-600/20 border border-green-500/30' :
+                    getPlayerResult() === 'loser' ? 'bg-red-600/20 border border-red-500/30' :
+                    'bg-yellow-600/20 border border-yellow-500/30'
+                  }`}>
+                    <div className="flex items-center justify-center space-x-2">
+                      {getPlayerResult() === 'winner' && <Crown className="h-6 w-6 text-yellow-400" />}
+                      {getPlayerResult() === 'loser' && <Flag className="h-6 w-6 text-red-400" />}
+                      <h2 className={`text-xl font-bold ${
+                        getPlayerResult() === 'winner' ? 'text-green-300' :
+                        getPlayerResult() === 'loser' ? 'text-red-300' :
+                        'text-yellow-300'
+                      }`}>
+                        {getPlayerResult() === 'winner' ? '🎉 You Won!' :
+                         getPlayerResult() === 'loser' ? '😔 You Lost' :
+                         '🤝 Draw Game'}
+                      </h2>
                     </div>
                   </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  {/* Black player info with captured pieces */}
+                  <div className="space-y-2">
+                    <div className={`rounded-lg p-3 ${
+                      gameState?.turn === 'b' && gameState?.gameStatus === 'active' ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-slate-700/50'
+                    }`}>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-3 h-3 bg-slate-900 rounded-full"></div>
+                        <span className="text-white font-medium text-sm sm:text-base">
+                          {gameData.blackPlayer?.username || 'Waiting...'}
+                        </span>
+                        {gameState?.turn === 'b' && gameState?.gameStatus === 'active' && (
+                          <Badge className="bg-blue-600 text-white text-xs">
+                            Your Turn
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    {/* Captured pieces by black */}
+                    <div className="text-xs text-gray-400 mb-1">Captured by Black:</div>
+                    {renderCapturedPieces(capturedPieces.black, 'black')}
+                  </div>
                   
-                  {/* Game info */}
+                  {/* Game status info */}
                   <div className="text-center">
                     {gameState?.isCheck && (
                       <Badge variant="destructive" className="mb-2">
@@ -384,16 +498,38 @@ export default function ChessGame() {
                         Draw!
                       </Badge>
                     )}
+                    
+                    {/* Turn indicator */}
+                    {gameState?.gameStatus === 'active' && (
+                      <div className="mt-2">
+                        <div className="text-sm text-gray-400 mb-1">Current Turn:</div>
+                        <Badge variant="outline" className="text-white text-base px-3 py-1">
+                          {gameState.turn === 'w' ? '⚪ White' : '⚫ Black'}
+                        </Badge>
+                      </div>
+                    )}
                   </div>
                   
-                  {/* White player info */}
-                  <div className="bg-slate-100/10 rounded-lg p-3">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-3 h-3 bg-white rounded-full"></div>
-                      <span className="text-white font-medium text-sm sm:text-base">
-                        {gameData.whitePlayer?.username || 'Waiting...'}
-                      </span>
+                  {/* White player info with captured pieces */}
+                  <div className="space-y-2">
+                    <div className={`rounded-lg p-3 ${
+                      gameState?.turn === 'w' && gameState?.gameStatus === 'active' ? 'bg-blue-600/30 border border-blue-500/50' : 'bg-slate-100/10'
+                    }`}>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-3 h-3 bg-white rounded-full"></div>
+                        <span className="text-white font-medium text-sm sm:text-base">
+                          {gameData.whitePlayer?.username || 'Waiting...'}
+                        </span>
+                        {gameState?.turn === 'w' && gameState?.gameStatus === 'active' && (
+                          <Badge className="bg-blue-600 text-white text-xs">
+                            Your Turn
+                          </Badge>
+                        )}
+                      </div>
                     </div>
+                    {/* Captured pieces by white */}
+                    <div className="text-xs text-gray-400 mb-1">Captured by White:</div>
+                    {renderCapturedPieces(capturedPieces.white, 'white')}
                   </div>
                 </div>
 
