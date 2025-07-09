@@ -1,9 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code, Users, Bug, Eye, Menu } from "lucide-react";
+import { Code, Users, Bug, Eye, Menu, GitBranch, Zap, Terminal } from "lucide-react";
 import { Link } from "wouter";
+import { useEffect, useState } from "react";
 
 export default function Landing() {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       {/* Background decorative elements */}
@@ -11,14 +18,47 @@ export default function Landing() {
         <div className="h-full w-full bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
       </div>
 
+      {/* Minimal floating elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Floating code brackets */}
+        <div className="absolute top-[20%] left-[10%] text-blue-400/20 text-3xl font-mono animate-pulse select-none">
+          &lt;/&gt;
+        </div>
+        <div className="absolute top-[60%] right-[15%] text-purple-400/20 text-2xl font-mono animate-pulse delay-500 select-none">
+          {'{'}
+        </div>
+        <div className="absolute top-[70%] right-[12%] text-purple-400/20 text-2xl font-mono animate-pulse delay-700 select-none">
+          {'}'}
+        </div>
+        
+        {/* Floating icons */}
+        <div className="absolute top-[30%] right-[20%] text-cyan-400/20 animate-bounce select-none">
+          <GitBranch className="h-6 w-6" />
+        </div>
+        <div className="absolute top-[80%] left-[20%] text-green-400/20 animate-bounce delay-300 select-none">
+          <Terminal className="h-5 w-5" />
+        </div>
+        <div className="absolute top-[40%] left-[15%] text-yellow-400/20 animate-bounce delay-1000 select-none">
+          <Zap className="h-4 w-4" />
+        </div>
+        
+        {/* Subtle flowchart elements */}
+        <div className="absolute top-[50%] left-[5%] text-indigo-400/20 text-sm font-mono animate-pulse delay-1500 select-none">
+          →
+        </div>
+        <div className="absolute top-[25%] right-[10%] text-pink-400/20 text-sm font-mono animate-pulse delay-2000 select-none">
+          ◊
+        </div>
+      </div>
+
       {/* Navigation */}
-      <nav className="relative z-50 p-4 lg:p-6">
+      <nav className={`relative z-50 p-4 lg:p-6 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
               <Code className="h-5 w-5 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">CodeVis.ai</span>
+            <span className="text-xl sm:text-2xl font-bold text-white">CodeVis.ai</span>
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
@@ -27,7 +67,7 @@ export default function Landing() {
 
           <div className="flex items-center space-x-4">
             <Link href="/auth">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base px-4 py-2 sm:px-6 sm:py-3 transition-all duration-300 hover:scale-105">
                 Sign In
               </Button>
             </Link>
@@ -39,69 +79,64 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 pt-12 pb-20">
-        <div className="text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 pt-8 sm:pt-12 pb-16 sm:pb-20">
+        <div className={`text-center transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           {/* Badge */}
-          <div className="inline-flex items-center px-4 py-2 bg-blue-600/20 backdrop-blur-sm rounded-full text-blue-300 text-sm mb-8 border border-blue-500/20">
+          <div className="inline-flex items-center px-4 py-2 bg-blue-600/20 backdrop-blur-sm rounded-full text-blue-300 text-sm mb-6 sm:mb-8 border border-blue-500/20">
             <div className="h-2 w-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
             AI-Powered Code Analysis
           </div>
 
-          {/* Main heading */}
-          <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            Visualize Code
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400">
-              Like Never Before
-            </span>
-          </h1>
+          {/* Main heading with glow effect */}
+          <div className="relative">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+              Visualize Code
+              <br />
+              <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400">
+                Like Never Before
+                {/* Glow effect */}
+                <div className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 blur-xl opacity-50 animate-pulse"></div>
+              </span>
+            </h1>
+          </div>
 
           {/* Subtitle */}
-          <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-10 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-4">
             Transform complex code into interactive visualizations with step-by-step explanations, 
             live variable tracking, and intelligent flowcharts powered by AI.
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
             <Link href="/visualize">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <Eye className="h-5 w-5 mr-2" />
                 Start Visualizing
               </Button>
             </Link>
             <Link href="/community">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <Users className="h-5 w-5 mr-2" />
                 Explore Community
               </Button>
             </Link>
           </div>
         </div>
-
-        {/* Decorative code elements */}
-        <div className="absolute top-20 left-10 text-blue-400/20 text-6xl font-mono hidden lg:block select-none">
-          &lt;/&gt;
-        </div>
-        <div className="absolute top-40 right-20 text-purple-400/20 text-4xl font-mono hidden lg:block select-none">
-          {'{'}
-          {'}'}
-        </div>
       </div>
 
       {/* Features Section */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 pb-20">
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 pb-16 sm:pb-20">
+        <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 transition-all duration-1000 delay-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           {/* Visualize Card */}
-          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group">
+          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1s_forwards]">
             <CardHeader className="pb-4">
-              <div className="h-16 w-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <div className="h-16 w-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-blue-400/50">
                 <Eye className="h-8 w-8 text-white" />
               </div>
-              <CardTitle className="text-white text-2xl font-bold">Visualize</CardTitle>
+              <CardTitle className="text-white text-xl sm:text-2xl font-bold">Visualize</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-gray-300 text-base leading-relaxed">
+              <CardDescription className="text-gray-300 text-sm sm:text-base leading-relaxed">
                 Transform your code into interactive step-by-step visualizations with AI-powered explanations, 
                 variable tracking, and dynamic flowcharts that make complex logic crystal clear.
               </CardDescription>
@@ -109,15 +144,15 @@ export default function Landing() {
           </Card>
 
           {/* Community Card */}
-          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group">
+          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.2s_forwards]">
             <CardHeader className="pb-4">
-              <div className="h-16 w-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <div className="h-16 w-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-purple-400/50">
                 <Users className="h-8 w-8 text-white" />
               </div>
-              <CardTitle className="text-white text-2xl font-bold">Community</CardTitle>
+              <CardTitle className="text-white text-xl sm:text-2xl font-bold">Community</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-gray-300 text-base leading-relaxed">
+              <CardDescription className="text-gray-300 text-sm sm:text-base leading-relaxed">
                 Share your visualizations, ask questions, and learn from other developers. 
                 Connect with a vibrant community of learners and experts sharing knowledge.
               </CardDescription>
@@ -125,15 +160,15 @@ export default function Landing() {
           </Card>
 
           {/* Debug Card */}
-          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group">
+          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group hover:shadow-2xl hover:shadow-green-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.4s_forwards] sm:col-span-2 lg:col-span-1">
             <CardHeader className="pb-4">
-              <div className="h-16 w-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+              <div className="h-16 w-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-green-400/50">
                 <Bug className="h-8 w-8 text-white" />
               </div>
-              <CardTitle className="text-white text-2xl font-bold">Debug</CardTitle>
+              <CardTitle className="text-white text-xl sm:text-2xl font-bold">Debug</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-gray-300 text-base leading-relaxed">
+              <CardDescription className="text-gray-300 text-sm sm:text-base leading-relaxed">
                 AI-powered code debugging that automatically detects errors, suggests fixes, 
                 and provides detailed explanations to help you write better, cleaner code.
               </CardDescription>
@@ -144,20 +179,20 @@ export default function Landing() {
 
       {/* How It Works Section */}
       <div className="relative z-10 bg-slate-800/20 backdrop-blur-sm border-y border-slate-700/30">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-20">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-16 sm:py-20">
           {/* Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6">How It Works</h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <div className={`text-center mb-12 sm:mb-16 transition-all duration-1000 delay-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">How It Works</h2>
+            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto px-4">
               Transform your code understanding with AI-powered analysis, visualization, and debugging
             </p>
           </div>
 
           {/* Top Features Grid */}
-          <div className="grid md:grid-cols-4 gap-6 mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 sm:mb-16">
             {/* Code Input */}
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.5s_forwards]">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-blue-400/50">
                 <Code className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Code Input</h3>
@@ -165,17 +200,17 @@ export default function Landing() {
             </div>
 
             {/* AI Analysis */}
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.7s_forwards]">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-purple-400/50">
                 <Eye className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">AI Analysis</h3>
               <p className="text-gray-400 text-sm">Advanced AI processes your code logic and structure</p>
             </div>
 
-            {/* Visualization */}
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+            {/* Debugging */}
+            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.9s_forwards]">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-green-400/50">
                 <Bug className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Debugging</h3>
@@ -183,8 +218,8 @@ export default function Landing() {
             </div>
 
             {/* Community */}
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_2.1s_forwards]">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-orange-400/50">
                 <Users className="h-8 w-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Community</h3>
