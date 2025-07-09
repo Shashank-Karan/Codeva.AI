@@ -365,8 +365,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Validate turn
         const isWhiteTurn = gameInstance.chess.turn() === 'w';
-        const isWhitePlayer = game.whitePlayer?.id?.toString() === userId;
-        const isBlackPlayer = game.blackPlayer?.id?.toString() === userId;
+        const isWhitePlayer = game.whitePlayer?.id?.toString() === userId.toString();
+        const isBlackPlayer = game.blackPlayer?.id?.toString() === userId.toString();
 
         if ((isWhiteTurn && !isWhitePlayer) || (!isWhiteTurn && !isBlackPlayer)) {
           socket.emit('error', { message: 'Not your turn' });
@@ -506,6 +506,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         console.error('Error making AI move:', error);
         socket.emit('error', { message: 'Failed to make AI move' });
+      }
+    });
+
+    // Handle resignation
+    socket.on('chess-resign', async (data) => {
+      try {
+        const { roomId, userId } = data;
+        
+        const game = await storage.getChessGame(roomId);
+        if (!game) {
+          socket.emit('error', { message: 'Game not found' });
+          return;
+        }
+
+        const gameInstance = activeGames.get(roomId);
+        if (!gameInstance) {
+          socket.emit('error', { message: 'Game instance not found' });
+          return;
+        }
+
+        // Determine winner (opponent of the resigning player)
+        const isWhitePlayer = game.whitePlayer?.id?.toString() === userId.toString();
+        const winner = isWhitePlayer ? 'black' : 'white';
+
+        // Update game state
+        await storage.updateChessGame(roomId, {
+          gameStatus: 'finished',
+          winner: winner
+        });
+
+        // Broadcast resignation
+        io.to(roomId).emit('game-state', {
+          fen: gameInstance.chess.fen(),
+          turn: gameInstance.chess.turn(),
+          isCheck: gameInstance.chess.isCheck(),
+          isCheckmate: false,
+          isStalemate: false,
+          isDraw: false,
+          gameStatus: 'finished',
+          winner: winner,
+          history: gameInstance.chess.history(),
+          whitePlayer: game.whitePlayer,
+          blackPlayer: game.blackPlayer
+        });
+
+        console.log(`Player ${userId} resigned in game ${roomId}`);
+      } catch (error) {
+        console.error('Error handling resignation:', error);
+        socket.emit('error', { message: 'Failed to resign' });
+      }
+    });
+
+    // Handle draw offer
+    socket.on('chess-offer-draw', async (data) => {
+      try {
+        const { roomId, userId } = data;
+        
+        const game = await storage.getChessGame(roomId);
+        if (!game) {
+          socket.emit('error', { message: 'Game not found' });
+          return;
+        }
+
+        // For simplicity, automatically accept draw offers
+        await storage.updateChessGame(roomId, {
+          gameStatus: 'finished',
+          winner: 'draw'
+        });
+
+        const gameInstance = activeGames.get(roomId);
+        
+        // Broadcast draw
+        io.to(roomId).emit('game-state', {
+          fen: gameInstance?.chess.fen() || game.currentFen,
+          turn: gameInstance?.chess.turn() || 'w',
+          isCheck: false,
+          isCheckmate: false,
+          isStalemate: false,
+          isDraw: true,
+          gameStatus: 'finished',
+          winner: 'draw',
+          history: gameInstance?.chess.history() || [],
+          whitePlayer: game.whitePlayer,
+          blackPlayer: game.blackPlayer
+        });
+
+        console.log(`Draw agreed in game ${roomId}`);
+      } catch (error) {
+        console.error('Error handling draw offer:', error);
+        socket.emit('error', { message: 'Failed to offer draw' });
       }
     });
 

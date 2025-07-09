@@ -89,8 +89,11 @@ export default function ChessGame() {
     });
 
     newSocket.on('game-state', (state: GameState) => {
+      console.log('Game state updated:', state);
       setGameState(state);
       chess.load(state.fen);
+      setSelectedSquare(null);
+      setPossibleMoves([]);
     });
 
     newSocket.on('chat-history', (messages: ChatMessage[]) => {
@@ -98,15 +101,17 @@ export default function ChessGame() {
     });
 
     newSocket.on('move-made', (data: any) => {
+      console.log('Move made:', data);
       chess.load(data.fen);
-      setGameState(prev => prev ? { ...prev, ...data } : null);
+      setGameState(prev => prev ? { ...prev, ...data } : data);
       setSelectedSquare(null);
       setPossibleMoves([]);
     });
 
     newSocket.on('ai-move-made', (data: any) => {
+      console.log('AI move made:', data);
       chess.load(data.fen);
-      setGameState(prev => prev ? { ...prev, ...data } : null);
+      setGameState(prev => prev ? { ...prev, ...data } : data);
       setSelectedSquare(null);
       setPossibleMoves([]);
     });
@@ -127,6 +132,7 @@ export default function ChessGame() {
 
     newSocket.on('error', (error: { message: string }) => {
       console.error('Socket error:', error.message);
+      // You could show a toast notification here if needed
     });
 
     setSocket(newSocket);
@@ -142,13 +148,19 @@ export default function ChessGame() {
   }, [chatMessages]);
 
   const handleSquareClick = (square: string) => {
-    if (!gameState || !user) return;
+    if (!gameState || !user || !gameData) return;
+
+    // Check if game is active
+    if (gameState.gameStatus !== 'active') return;
 
     const isPlayerTurn = 
       (gameState.turn === 'w' && gameData?.whitePlayer?.id === user.id) ||
       (gameState.turn === 'b' && gameData?.blackPlayer?.id === user.id);
 
-    if (!isPlayerTurn) return;
+    if (!isPlayerTurn) {
+      console.log('Not your turn');
+      return;
+    }
 
     if (selectedSquare) {
       // Try to make a move - use a temporary chess instance to validate
@@ -201,6 +213,24 @@ export default function ChessGame() {
     if (!socket || !user || gameData?.gameType !== 'ai') return;
     
     socket.emit('request-ai-move', {
+      roomId,
+      userId: user.id,
+    });
+  };
+
+  const handleResign = () => {
+    if (!socket || !user) return;
+    
+    socket.emit('chess-resign', {
+      roomId,
+      userId: user.id,
+    });
+  };
+
+  const handleOfferDraw = () => {
+    if (!socket || !user) return;
+    
+    socket.emit('chess-offer-draw', {
       roomId,
       userId: user.id,
     });
@@ -380,19 +410,41 @@ export default function ChessGame() {
                   </div>
                 </div>
 
-                {/* AI Move Button */}
-                {gameData.gameType === 'ai' && gameState?.turn === 'b' && (
-                  <div className="flex justify-center">
+                {/* Game Actions */}
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  {/* AI Move Button */}
+                  {gameData.gameType === 'ai' && gameState?.turn === 'b' && gameState?.gameStatus === 'active' && (
                     <Button
                       onClick={handleRequestAIMove}
-                      disabled={gameState?.gameStatus !== 'active'}
                       className="bg-purple-600 hover:bg-purple-700"
                     >
                       <Bot className="h-4 w-4 mr-2" />
                       Request AI Move
                     </Button>
-                  </div>
-                )}
+                  )}
+                  
+                  {/* Player Action Buttons */}
+                  {gameState?.gameStatus === 'active' && (
+                    <>
+                      <Button
+                        onClick={handleOfferDraw}
+                        variant="outline"
+                        className="border-yellow-500 text-yellow-400 hover:bg-yellow-500/10"
+                      >
+                        <Flag className="h-4 w-4 mr-2" />
+                        Offer Draw
+                      </Button>
+                      <Button
+                        onClick={handleResign}
+                        variant="destructive"
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        <Flag className="h-4 w-4 mr-2" />
+                        Resign
+                      </Button>
+                    </>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>

@@ -91,7 +91,7 @@ export default function ChessBoard({
       <div className="flex">
         <div className="flex flex-col justify-center mr-1 sm:mr-2">
           {displayRanks.map((rank) => (
-            <div key={rank} className="h-8 sm:h-12 flex items-center text-amber-200 font-bold text-xs sm:text-sm">
+            <div key={rank} className="h-10 sm:h-12 md:h-14 lg:h-16 flex items-center text-amber-200 font-bold text-xs sm:text-sm">
               {rank}
             </div>
           ))}
@@ -111,25 +111,26 @@ export default function ChessBoard({
                   <div
                     key={square}
                     className={`
-                      w-8 h-8 sm:w-12 sm:h-12 relative cursor-pointer
+                      w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 relative cursor-pointer transition-all duration-200
                       ${getSquareColor(file, rank)}
-                      ${isSelected ? 'ring-2 ring-blue-500' : ''}
-                      ${isPossibleMove ? 'ring-2 ring-green-500' : ''}
-                      hover:ring-2 hover:ring-blue-300
+                      ${isSelected ? 'ring-2 ring-blue-500 bg-blue-400/30' : ''}
+                      ${isPossibleMove ? 'ring-2 ring-green-500 bg-green-400/20' : ''}
+                      hover:ring-2 hover:ring-blue-300 hover:bg-blue-300/20
+                      active:bg-blue-500/30
                     `}
                     onClick={() => onSquareClick(square)}
                   >
                     {/* Possible move indicator */}
                     {isPossibleMove && !piece && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full opacity-60"></div>
+                        <div className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 bg-green-500 rounded-full opacity-70"></div>
                       </div>
                     )}
                     
                     {/* Piece */}
                     {piece && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-2xl sm:text-4xl select-none">
+                        <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl select-none font-bold drop-shadow-sm">
                           {pieceSymbols[piece]}
                         </span>
                       </div>
@@ -137,7 +138,7 @@ export default function ChessBoard({
                     
                     {/* Possible move indicator for pieces */}
                     {isPossibleMove && piece && (
-                      <div className="absolute inset-0 ring-2 ring-green-500 rounded-full opacity-60"></div>
+                      <div className="absolute inset-0 border-2 border-green-500 rounded-lg bg-green-400/20"></div>
                     )}
                     
                     {/* Square coordinates (for debugging) */}
@@ -155,7 +156,7 @@ export default function ChessBoard({
       {/* File labels (bottom) */}
       <div className="flex justify-center mt-1 sm:mt-2 ml-3 sm:ml-6">
         {displayFiles.map((file) => (
-          <div key={file} className="w-8 sm:w-12 text-center text-amber-200 font-bold text-xs sm:text-sm">
+          <div key={file} className="w-10 sm:w-12 md:w-14 lg:w-16 text-center text-amber-200 font-bold text-xs sm:text-sm">
             {file}
           </div>
         ))}
