@@ -117,20 +117,23 @@ export default function Landing() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 pt-8 sm:pt-12 pb-16 sm:pb-20">
         <div className={`text-center transition-all duration-1000 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
           {/* Badge */}
-          <div className="inline-flex items-center px-4 py-2 bg-blue-600/20 backdrop-blur-sm rounded-full text-blue-300 text-sm mb-6 sm:mb-8 border border-blue-500/20">
+          <div className="inline-flex items-center px-4 py-2 bg-blue-600/20 backdrop-blur-sm rounded-full text-blue-300 text-sm mb-6 sm:mb-8 border border-blue-500/20 animate-[float_3s_ease-in-out_infinite_1s]">
             <div className="h-2 w-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
             AI-Powered Code Analysis
           </div>
 
-          {/* Main heading with glow effect */}
+          {/* Main heading with floating and glowing effect */}
           <div className="relative">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Visualize Code
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight animate-[floatSlow_4s_ease-in-out_infinite]">
+              <span className="inline-block animate-[textGlow_3s_ease-in-out_infinite]">
+                Visualize Code
+              </span>
               <br />
-              <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400">
+              <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 animate-[textGlow_3s_ease-in-out_infinite_0.5s]">
                 Like Never Before
-                {/* Glow effect */}
-                <div className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 blur-xl opacity-50 animate-pulse"></div>
+                {/* Enhanced glow effect */}
+                <div className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 blur-xl opacity-60 animate-pulse"></div>
+                <div className="absolute inset-0 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 blur-2xl opacity-30 animate-pulse delay-500"></div>
               </span>
             </h1>
           </div>
