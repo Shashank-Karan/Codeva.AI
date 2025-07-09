@@ -89,6 +89,7 @@ export const debugResults = pgTable("debug_results", {
 export const chessGames = pgTable("chess_games", {
   id: serial("id").primaryKey(),
   roomId: varchar("room_id").notNull().unique(),
+  gameName: varchar("game_name"), // Custom game name
   whitePlayerId: integer("white_player_id").references(() => users.id),
   blackPlayerId: integer("black_player_id").references(() => users.id),
   gameState: jsonb("game_state").notNull(), // Chess.js game state
@@ -201,11 +202,13 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export const insertChessGameSchema = createInsertSchema(chessGames).pick({
   roomId: true,
+  gameName: true,
   gameType: true,
   isPrivate: true,
   password: true,
 }).extend({
   password: z.string().optional(),
+  gameName: z.string().optional(),
 });
 
 export const insertChessMessageSchema = createInsertSchema(chessGameMessages).pick({

@@ -293,8 +293,8 @@ export class DatabaseStorage implements IStorage {
       updateData.blackPlayerId = parseInt(userId);
     }
 
-    // Only set to active if both players are present
-    if (game.whitePlayerId || game.blackPlayerId) {
+    // Only set to active if both players are present after this join
+    if ((game.whitePlayerId && updateData.blackPlayerId) || (game.blackPlayerId && updateData.whitePlayerId)) {
       updateData.gameStatus = 'active';
     }
 

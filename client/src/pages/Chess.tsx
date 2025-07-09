@@ -165,6 +165,8 @@ export default function Chess() {
 function GameCard({ game }: { game: ChessGame }) {
   const { user } = useAuth();
   const [isJoining, setIsJoining] = useState(false);
+  const [joinPassword, setJoinPassword] = useState('');
+  const [showPasswordInput, setShowPasswordInput] = useState(false);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -185,6 +187,11 @@ function GameCard({ game }: { game: ChessGame }) {
   const handleJoinGame = async () => {
     if (!canJoin()) return;
     
+    if (game.isPrivate && !showPasswordInput) {
+      setShowPasswordInput(true);
+      return;
+    }
+    
     setIsJoining(true);
     try {
       const response = await fetch(`/api/chess/games/${game.roomId}/join`, {
@@ -192,7 +199,9 @@ function GameCard({ game }: { game: ChessGame }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({
+          password: game.isPrivate ? joinPassword : undefined,
+        }),
       });
 
       if (response.ok) {
@@ -203,10 +212,13 @@ function GameCard({ game }: { game: ChessGame }) {
         // Navigate to the game
         window.location.href = `/chess/game/${game.roomId}`;
       } else {
-        console.error('Failed to join game');
+        const errorData = await response.json();
+        console.error('Failed to join game:', errorData.message);
+        alert(errorData.message || 'Failed to join game');
       }
     } catch (error) {
       console.error('Error joining game:', error);
+      alert('Failed to join game');
     } finally {
       setIsJoining(false);
     }
@@ -222,9 +234,16 @@ function GameCard({ game }: { game: ChessGame }) {
             ) : (
               <Users className="h-5 w-5 text-blue-400" />
             )}
-            <span className="text-white font-medium">
-              {game.gameType === 'ai' ? 'vs AI' : 'Multiplayer'}
-            </span>
+            <div className="flex flex-col">
+              <span className="text-white font-medium">
+                {game.gameName || (game.gameType === 'ai' ? 'vs AI' : 'Multiplayer')}
+              </span>
+              {game.gameName && (
+                <span className="text-sm text-gray-400">
+                  {game.gameType === 'ai' ? 'vs AI' : 'Multiplayer'}
+                </span>
+              )}
+            </div>
           </div>
           <Badge className={getStatusColor(game.gameStatus)}>
             {game.gameStatus}
@@ -250,7 +269,7 @@ function GameCard({ game }: { game: ChessGame }) {
                 disabled={isJoining}
               >
                 <Play className="h-4 w-4 mr-2" />
-                {isJoining ? 'Joining...' : 'Join Game'}
+                {isJoining ? 'Joining...' : (game.isPrivate && !showPasswordInput ? 'Enter Password' : 'Join Game')}
               </Button>
             )}
             <Link href={`/chess/game/${game.roomId}`}>
@@ -273,6 +292,36 @@ function GameCard({ game }: { game: ChessGame }) {
           </div>
         </div>
       </div>
+      {showPasswordInput && (
+        <div className="mt-4 flex items-center space-x-2">
+          <input
+            type="password"
+            value={joinPassword}
+            onChange={(e) => setJoinPassword(e.target.value)}
+            placeholder="Enter password"
+            className="flex-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Button
+            size="sm"
+            onClick={handleJoinGame}
+            disabled={isJoining || !joinPassword}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {isJoining ? 'Joining...' : 'Join'}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setShowPasswordInput(false);
+              setJoinPassword('');
+            }}
+            className="border-slate-600 text-slate-300 hover:bg-slate-700"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -311,9 +360,16 @@ function GameHistoryCard({ game, currentUserId }: { game: ChessGame; currentUser
             ) : (
               <Users className="h-5 w-5 text-blue-400" />
             )}
-            <span className="text-white font-medium">
-              {playerColor} vs {opponent?.username || 'AI'}
-            </span>
+            <div className="flex flex-col">
+              <span className="text-white font-medium">
+                {game.gameName || `${playerColor} vs ${opponent?.username || 'AI'}`}
+              </span>
+              {game.gameName && (
+                <span className="text-sm text-gray-400">
+                  {playerColor} vs {opponent?.username || 'AI'}
+                </span>
+              )}
+            </div>
           </div>
           <Badge className={getResultColor(game.winner)}>
             {getResultText(game.winner)}
@@ -339,6 +395,7 @@ function CreateGameForm() {
   const [gameType, setGameType] = useState<'multiplayer' | 'ai'>('multiplayer');
   const [isPrivate, setIsPrivate] = useState(false);
   const [password, setPassword] = useState('');
+  const [gameName, setGameName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateGame = async () => {
@@ -353,6 +410,7 @@ function CreateGameForm() {
         },
         body: JSON.stringify({
           roomId,
+          gameName: gameName.trim() || undefined,
           gameType,
           isPrivate,
           password: isPrivate ? password : undefined,
@@ -384,6 +442,20 @@ function CreateGameForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        <div>
+          <label htmlFor="gameName" className="block text-sm font-medium text-gray-300 mb-2">
+            Game Name (optional)
+          </label>
+          <input
+            type="text"
+            id="gameName"
+            value={gameName}
+            onChange={(e) => setGameName(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter custom game name"
+            maxLength={50}
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <Button
             variant={gameType === 'multiplayer' ? 'default' : 'outline'}
