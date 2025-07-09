@@ -4,6 +4,8 @@ import {
   postLikes,
   codeAnalysis,
   debugResults,
+  chessGames,
+  chessGameMessages,
   type User,
   type UpsertUser,
   type Post,
@@ -13,6 +15,12 @@ import {
   type InsertCodeAnalysis,
   type DebugResult,
   type InsertDebugRequest,
+  type ChessGame,
+  type ChessGameWithPlayers,
+  type InsertChessGame,
+  type ChessGameMessage,
+  type ChessGameMessageWithUser,
+  type InsertChessMessage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
@@ -38,6 +46,18 @@ export interface IStorage {
   // Debug operations
   saveDebugResult(userId: string | undefined, request: InsertDebugRequest, results: any): Promise<DebugResult>;
   getUserDebugResults(userId: string): Promise<DebugResult[]>;
+  
+  // Chess game operations
+  createChessGame(userId: string, gameData: InsertChessGame): Promise<ChessGame>;
+  getChessGame(roomId: string): Promise<ChessGameWithPlayers | undefined>;
+  updateChessGame(roomId: string, gameData: Partial<ChessGame>): Promise<ChessGame>;
+  joinChessGame(roomId: string, userId: string, password?: string): Promise<ChessGameWithPlayers>;
+  getActiveChessGames(): Promise<ChessGameWithPlayers[]>;
+  getUserChessGames(userId: string): Promise<ChessGameWithPlayers[]>;
+  
+  // Chess game messages
+  addChessGameMessage(gameId: number, userId: string, message: InsertChessMessage): Promise<ChessGameMessage>;
+  getChessGameMessages(gameId: number): Promise<ChessGameMessageWithUser[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -195,6 +215,167 @@ export class DatabaseStorage implements IStorage {
       .from(debugResults)
       .where(eq(debugResults.userId, parseInt(userId)))
       .orderBy(desc(debugResults.createdAt));
+  }
+
+  // Chess game operations
+  async createChessGame(userId: string, gameData: InsertChessGame): Promise<ChessGame> {
+    const [game] = await db
+      .insert(chessGames)
+      .values({
+        ...gameData,
+        whitePlayerId: parseInt(userId),
+        gameState: { moves: [], turn: 'w', history: [] },
+        currentFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+      })
+      .returning();
+    return game;
+  }
+
+  async getChessGame(roomId: string): Promise<ChessGameWithPlayers | undefined> {
+    const games = await db
+      .select()
+      .from(chessGames)
+      .where(eq(chessGames.roomId, roomId));
+
+    if (games.length === 0) return undefined;
+
+    const game = games[0];
+    let whitePlayer = null;
+    let blackPlayer = null;
+
+    if (game.whitePlayerId) {
+      whitePlayer = await this.getUser(game.whitePlayerId.toString());
+    }
+    if (game.blackPlayerId) {
+      blackPlayer = await this.getUser(game.blackPlayerId.toString());
+    }
+
+    return {
+      ...game,
+      whitePlayer,
+      blackPlayer,
+    };
+  }
+
+  async updateChessGame(roomId: string, gameData: Partial<ChessGame>): Promise<ChessGame> {
+    const [game] = await db
+      .update(chessGames)
+      .set({ ...gameData, updatedAt: new Date() })
+      .where(eq(chessGames.roomId, roomId))
+      .returning();
+    return game;
+  }
+
+  async joinChessGame(roomId: string, userId: string, password?: string): Promise<ChessGameWithPlayers> {
+    const game = await this.getChessGame(roomId);
+    if (!game) {
+      throw new Error('Game not found');
+    }
+
+    if (game.isPrivate && game.password !== password) {
+      throw new Error('Invalid password');
+    }
+
+    if (game.whitePlayerId && game.blackPlayerId) {
+      throw new Error('Game is full');
+    }
+
+    const updatedGame = await this.updateChessGame(roomId, {
+      blackPlayerId: parseInt(userId),
+      gameStatus: 'active',
+    });
+
+    return await this.getChessGame(roomId) as ChessGameWithPlayers;
+  }
+
+  async getActiveChessGames(): Promise<ChessGameWithPlayers[]> {
+    const games = await db
+      .select()
+      .from(chessGames)
+      .where(eq(chessGames.gameStatus, 'waiting'))
+      .orderBy(desc(chessGames.createdAt));
+
+    const gamesWithPlayers = [];
+    for (const game of games) {
+      let whitePlayer = null;
+      let blackPlayer = null;
+
+      if (game.whitePlayerId) {
+        whitePlayer = await this.getUser(game.whitePlayerId.toString());
+      }
+      if (game.blackPlayerId) {
+        blackPlayer = await this.getUser(game.blackPlayerId.toString());
+      }
+
+      gamesWithPlayers.push({
+        ...game,
+        whitePlayer,
+        blackPlayer,
+      });
+    }
+
+    return gamesWithPlayers;
+  }
+
+  async getUserChessGames(userId: string): Promise<ChessGameWithPlayers[]> {
+    const games = await db
+      .select()
+      .from(chessGames)
+      .where(sql`${chessGames.whitePlayerId} = ${parseInt(userId)} OR ${chessGames.blackPlayerId} = ${parseInt(userId)}`)
+      .orderBy(desc(chessGames.createdAt));
+
+    const gamesWithPlayers = [];
+    for (const game of games) {
+      let whitePlayer = null;
+      let blackPlayer = null;
+
+      if (game.whitePlayerId) {
+        whitePlayer = await this.getUser(game.whitePlayerId.toString());
+      }
+      if (game.blackPlayerId) {
+        blackPlayer = await this.getUser(game.blackPlayerId.toString());
+      }
+
+      gamesWithPlayers.push({
+        ...game,
+        whitePlayer,
+        blackPlayer,
+      });
+    }
+
+    return gamesWithPlayers;
+  }
+
+  // Chess game messages
+  async addChessGameMessage(gameId: number, userId: string, message: InsertChessMessage): Promise<ChessGameMessage> {
+    const [newMessage] = await db
+      .insert(chessGameMessages)
+      .values({
+        ...message,
+        gameId,
+        userId: parseInt(userId),
+      })
+      .returning();
+    return newMessage;
+  }
+
+  async getChessGameMessages(gameId: number): Promise<ChessGameMessageWithUser[]> {
+    const messages = await db
+      .select()
+      .from(chessGameMessages)
+      .where(eq(chessGameMessages.gameId, gameId))
+      .orderBy(chessGameMessages.createdAt);
+
+    const messagesWithUsers = [];
+    for (const message of messages) {
+      const user = await this.getUser(message.userId.toString());
+      messagesWithUsers.push({
+        ...message,
+        user,
+      });
+    }
+
+    return messagesWithUsers;
   }
 }
 

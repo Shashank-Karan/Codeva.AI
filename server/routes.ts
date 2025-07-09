@@ -1,9 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { Server as SocketIOServer } from "socket.io";
+import { Chess } from "chess.js";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { analyzeCode, debugCode } from "./services/gemini";
-import { insertPostSchema, insertCodeAnalysisSchema, insertDebugSchema } from "@shared/schema";
+import { insertPostSchema, insertCodeAnalysisSchema, insertDebugSchema, insertChessGameSchema, insertChessMessageSchema } from "@shared/schema";
 
 // Simple auth middleware
 function isAuthenticated(req: any, res: any, next: any) {
@@ -146,6 +148,388 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Chess game routes
+  app.post('/api/chess/games', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id.toString();
+      const gameData = insertChessGameSchema.parse(req.body);
+      
+      const game = await storage.createChessGame(userId, gameData);
+      res.json(game);
+    } catch (error) {
+      console.error("Error creating chess game:", error);
+      res.status(500).json({ message: "Failed to create chess game" });
+    }
+  });
+
+  app.get('/api/chess/games', async (req: any, res) => {
+    try {
+      const games = await storage.getActiveChessGames();
+      res.json(games);
+    } catch (error) {
+      console.error("Error fetching active chess games:", error);
+      res.status(500).json({ message: "Failed to fetch active chess games" });
+    }
+  });
+
+  app.get('/api/chess/games/:roomId', async (req: any, res) => {
+    try {
+      const { roomId } = req.params;
+      const game = await storage.getChessGame(roomId);
+      
+      if (!game) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+      
+      res.json(game);
+    } catch (error) {
+      console.error("Error fetching chess game:", error);
+      res.status(500).json({ message: "Failed to fetch chess game" });
+    }
+  });
+
+  app.post('/api/chess/games/:roomId/join', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id.toString();
+      const { roomId } = req.params;
+      const { password } = req.body;
+      
+      const game = await storage.joinChessGame(roomId, userId, password);
+      res.json(game);
+    } catch (error) {
+      console.error("Error joining chess game:", error);
+      res.status(500).json({ message: error.message || "Failed to join chess game" });
+    }
+  });
+
+  app.get('/api/chess/games/:roomId/messages', async (req: any, res) => {
+    try {
+      const { roomId } = req.params;
+      const game = await storage.getChessGame(roomId);
+      
+      if (!game) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+      
+      const messages = await storage.getChessGameMessages(game.id);
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching chess game messages:", error);
+      res.status(500).json({ message: "Failed to fetch chess game messages" });
+    }
+  });
+
+  app.post('/api/chess/games/:roomId/messages', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id.toString();
+      const { roomId } = req.params;
+      const messageData = insertChessMessageSchema.parse(req.body);
+      
+      const game = await storage.getChessGame(roomId);
+      if (!game) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+      
+      const message = await storage.addChessGameMessage(game.id, userId, messageData);
+      res.json(message);
+    } catch (error) {
+      console.error("Error adding chess game message:", error);
+      res.status(500).json({ message: "Failed to add chess game message" });
+    }
+  });
+
+  app.get('/api/chess/user/games', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id.toString();
+      const games = await storage.getUserChessGames(userId);
+      res.json(games);
+    } catch (error) {
+      console.error("Error fetching user chess games:", error);
+      res.status(500).json({ message: "Failed to fetch user chess games" });
+    }
+  });
+
   const httpServer = createServer(app);
+  
+  // Setup WebSocket server for real-time chess gameplay
+  const io = new SocketIOServer(httpServer, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+
+  // Store active chess games and socket connections
+  const activeGames = new Map<string, { chess: Chess; players: Map<string, any> }>();
+  const userSockets = new Map<string, string>(); // userId -> socketId mapping
+
+  io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    // Join chess game room
+    socket.on('join-chess-game', async (data) => {
+      try {
+        const { roomId, userId } = data;
+        
+        // Get game from database
+        const game = await storage.getChessGame(roomId);
+        if (!game) {
+          socket.emit('error', { message: 'Game not found' });
+          return;
+        }
+
+        // Initialize or get chess game instance
+        if (!activeGames.has(roomId)) {
+          const chess = new Chess();
+          if (game.currentFen && game.currentFen !== chess.fen()) {
+            chess.load(game.currentFen);
+          }
+          activeGames.set(roomId, {
+            chess,
+            players: new Map()
+          });
+        }
+
+        const gameInstance = activeGames.get(roomId)!;
+        gameInstance.players.set(userId, socket.id);
+        userSockets.set(userId, socket.id);
+
+        // Join the room
+        socket.join(roomId);
+
+        // Send current game state
+        socket.emit('game-state', {
+          fen: gameInstance.chess.fen(),
+          turn: gameInstance.chess.turn(),
+          isCheck: gameInstance.chess.isCheck(),
+          isCheckmate: gameInstance.chess.isCheckmate(),
+          isStalemate: gameInstance.chess.isStalemate(),
+          isDraw: gameInstance.chess.isDraw(),
+          gameStatus: game.gameStatus,
+          whitePlayer: game.whitePlayer,
+          blackPlayer: game.blackPlayer,
+          history: gameInstance.chess.history()
+        });
+
+        // Load and send chat messages
+        const messages = await storage.getChessGameMessages(game.id);
+        socket.emit('chat-history', messages);
+
+        console.log(`User ${userId} joined game ${roomId}`);
+        
+        // Notify other players
+        socket.to(roomId).emit('player-joined', {
+          userId,
+          gameState: {
+            fen: gameInstance.chess.fen(),
+            turn: gameInstance.chess.turn(),
+            whitePlayer: game.whitePlayer,
+            blackPlayer: game.blackPlayer
+          }
+        });
+      } catch (error) {
+        console.error('Error joining chess game:', error);
+        socket.emit('error', { message: 'Failed to join game' });
+      }
+    });
+
+    // Handle chess moves
+    socket.on('chess-move', async (data) => {
+      try {
+        const { roomId, move, userId } = data;
+        
+        const game = await storage.getChessGame(roomId);
+        if (!game) {
+          socket.emit('error', { message: 'Game not found' });
+          return;
+        }
+
+        const gameInstance = activeGames.get(roomId);
+        if (!gameInstance) {
+          socket.emit('error', { message: 'Game instance not found' });
+          return;
+        }
+
+        // Validate turn
+        const isWhiteTurn = gameInstance.chess.turn() === 'w';
+        const isWhitePlayer = game.whitePlayerId?.toString() === userId;
+        const isBlackPlayer = game.blackPlayerId?.toString() === userId;
+
+        if ((isWhiteTurn && !isWhitePlayer) || (!isWhiteTurn && !isBlackPlayer)) {
+          socket.emit('error', { message: 'Not your turn' });
+          return;
+        }
+
+        // Attempt to make the move
+        const result = gameInstance.chess.move(move);
+        if (!result) {
+          socket.emit('error', { message: 'Invalid move' });
+          return;
+        }
+
+        // Update game state in database
+        const newGameState = {
+          currentFen: gameInstance.chess.fen(),
+          gameState: {
+            moves: gameInstance.chess.history(),
+            turn: gameInstance.chess.turn(),
+            history: gameInstance.chess.history({ verbose: true })
+          },
+          moveHistory: gameInstance.chess.history()
+        };
+
+        // Check for game end
+        if (gameInstance.chess.isGameOver()) {
+          if (gameInstance.chess.isCheckmate()) {
+            newGameState.gameStatus = 'finished';
+            newGameState.winner = gameInstance.chess.turn() === 'w' ? 'black' : 'white';
+          } else if (gameInstance.chess.isStalemate() || gameInstance.chess.isDraw()) {
+            newGameState.gameStatus = 'finished';
+            newGameState.winner = 'draw';
+          }
+        }
+
+        await storage.updateChessGame(roomId, newGameState);
+
+        // Broadcast move to all players in the room
+        io.to(roomId).emit('move-made', {
+          move: result,
+          fen: gameInstance.chess.fen(),
+          turn: gameInstance.chess.turn(),
+          isCheck: gameInstance.chess.isCheck(),
+          isCheckmate: gameInstance.chess.isCheckmate(),
+          isStalemate: gameInstance.chess.isStalemate(),
+          isDraw: gameInstance.chess.isDraw(),
+          gameStatus: newGameState.gameStatus,
+          winner: newGameState.winner,
+          history: gameInstance.chess.history()
+        });
+
+        console.log(`Move made in game ${roomId}: ${result.san}`);
+      } catch (error) {
+        console.error('Error making chess move:', error);
+        socket.emit('error', { message: 'Failed to make move' });
+      }
+    });
+
+    // Handle chat messages
+    socket.on('chess-chat', async (data) => {
+      try {
+        const { roomId, message, userId } = data;
+        
+        const game = await storage.getChessGame(roomId);
+        if (!game) {
+          socket.emit('error', { message: 'Game not found' });
+          return;
+        }
+
+        // Save message to database
+        const chatMessage = await storage.addChessGameMessage(game.id, userId, {
+          message,
+          messageType: 'chat'
+        });
+
+        // Get user info for the message
+        const user = await storage.getUser(userId);
+        const messageWithUser = {
+          ...chatMessage,
+          user
+        };
+
+        // Broadcast message to all players in the room
+        io.to(roomId).emit('chat-message', messageWithUser);
+
+        console.log(`Chat message in game ${roomId}: ${message}`);
+      } catch (error) {
+        console.error('Error sending chat message:', error);
+        socket.emit('error', { message: 'Failed to send message' });
+      }
+    });
+
+    // Handle AI moves (for single-player games)
+    socket.on('request-ai-move', async (data) => {
+      try {
+        const { roomId, userId } = data;
+        
+        const game = await storage.getChessGame(roomId);
+        if (!game || game.gameType !== 'ai') {
+          socket.emit('error', { message: 'AI move not available for this game' });
+          return;
+        }
+
+        const gameInstance = activeGames.get(roomId);
+        if (!gameInstance) {
+          socket.emit('error', { message: 'Game instance not found' });
+          return;
+        }
+
+        // Simple AI: make a random legal move
+        const possibleMoves = gameInstance.chess.moves();
+        if (possibleMoves.length === 0) {
+          return; // Game is over
+        }
+
+        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        const result = gameInstance.chess.move(randomMove);
+
+        if (result) {
+          // Update game state in database
+          const newGameState = {
+            currentFen: gameInstance.chess.fen(),
+            gameState: {
+              moves: gameInstance.chess.history(),
+              turn: gameInstance.chess.turn(),
+              history: gameInstance.chess.history({ verbose: true })
+            },
+            moveHistory: gameInstance.chess.history()
+          };
+
+          await storage.updateChessGame(roomId, newGameState);
+
+          // Broadcast AI move
+          io.to(roomId).emit('ai-move-made', {
+            move: result,
+            fen: gameInstance.chess.fen(),
+            turn: gameInstance.chess.turn(),
+            isCheck: gameInstance.chess.isCheck(),
+            isCheckmate: gameInstance.chess.isCheckmate(),
+            isStalemate: gameInstance.chess.isStalemate(),
+            isDraw: gameInstance.chess.isDraw(),
+            history: gameInstance.chess.history()
+          });
+
+          console.log(`AI move made in game ${roomId}: ${result.san}`);
+        }
+      } catch (error) {
+        console.error('Error making AI move:', error);
+        socket.emit('error', { message: 'Failed to make AI move' });
+      }
+    });
+
+    // Handle disconnect
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
+      
+      // Remove user from active games
+      for (const [roomId, gameData] of activeGames.entries()) {
+        for (const [userId, socketId] of gameData.players.entries()) {
+          if (socketId === socket.id) {
+            gameData.players.delete(userId);
+            userSockets.delete(userId);
+            
+            // Notify other players
+            socket.to(roomId).emit('player-disconnected', { userId });
+            
+            // Clean up empty games
+            if (gameData.players.size === 0) {
+              activeGames.delete(roomId);
+            }
+            break;
+          }
+        }
+      }
+    });
+  });
+
   return httpServer;
 }
