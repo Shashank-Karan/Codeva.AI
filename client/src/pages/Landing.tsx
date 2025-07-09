@@ -2,13 +2,48 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Code, Users, Bug, Eye, Menu, GitBranch, Zap, Terminal } from "lucide-react";
 import { Link } from "wouter";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function Landing() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     setIsLoaded(true);
+    
+    // Intersection Observer for fade-in/fade-out effects
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const cardIndex = parseInt(entry.target.getAttribute('data-card-index') || '0');
+          if (entry.isIntersecting) {
+            setVisibleCards(prev => new Set([...prev, cardIndex]));
+          } else {
+            setVisibleCards(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(cardIndex);
+              return newSet;
+            });
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px 0px -50px 0px'
+      }
+    );
+
+    // Observe all cards
+    cardRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => {
+      cardRefs.current.forEach((ref) => {
+        if (ref) observer.unobserve(ref);
+      });
+    };
   }, []);
 
   return (
@@ -126,9 +161,17 @@ export default function Landing() {
 
       {/* Features Section */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 pb-16 sm:pb-20">
-        <div className={`grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 transition-all duration-1000 delay-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Visualize Card */}
-          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1s_forwards]">
+          <Card 
+            ref={(el) => cardRefs.current[0] = el}
+            data-card-index="0"
+            className={`bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-500 group hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 sm:col-span-2 lg:col-span-1 transform ${
+              visibleCards.has(0) 
+                ? 'opacity-100 translate-y-0 scale-100' 
+                : 'opacity-0 translate-y-8 scale-95'
+            }`}
+          >
             <CardHeader className="pb-4">
               <div className="h-16 w-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-blue-400/50">
                 <Eye className="h-8 w-8 text-white" />
@@ -144,7 +187,15 @@ export default function Landing() {
           </Card>
 
           {/* Community Card */}
-          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.2s_forwards]">
+          <Card 
+            ref={(el) => cardRefs.current[1] = el}
+            data-card-index="1"
+            className={`bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-500 group hover:shadow-2xl hover:shadow-purple-500/20 hover:-translate-y-1 transform ${
+              visibleCards.has(1) 
+                ? 'opacity-100 translate-y-0 scale-100' 
+                : 'opacity-0 translate-y-8 scale-95'
+            }`}
+          >
             <CardHeader className="pb-4">
               <div className="h-16 w-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-purple-400/50">
                 <Users className="h-8 w-8 text-white" />
@@ -160,7 +211,15 @@ export default function Landing() {
           </Card>
 
           {/* Debug Card */}
-          <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-300 group hover:shadow-2xl hover:shadow-green-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.4s_forwards] sm:col-span-2 lg:col-span-1">
+          <Card 
+            ref={(el) => cardRefs.current[2] = el}
+            data-card-index="2"
+            className={`bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-500 group hover:shadow-2xl hover:shadow-green-500/20 hover:-translate-y-1 sm:col-span-2 lg:col-span-1 transform ${
+              visibleCards.has(2) 
+                ? 'opacity-100 translate-y-0 scale-100' 
+                : 'opacity-0 translate-y-8 scale-95'
+            }`}
+          >
             <CardHeader className="pb-4">
               <div className="h-16 w-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-green-400/50">
                 <Bug className="h-8 w-8 text-white" />
@@ -191,7 +250,15 @@ export default function Landing() {
           {/* Top Features Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 sm:mb-16">
             {/* Code Input */}
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.5s_forwards]">
+            <div 
+              ref={(el) => cardRefs.current[3] = el}
+              data-card-index="3"
+              className={`bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-1 transform ${
+                visibleCards.has(3) 
+                  ? 'opacity-100 translate-y-0 scale-100' 
+                  : 'opacity-0 translate-y-8 scale-95'
+              }`}
+            >
               <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-blue-400/50">
                 <Code className="h-8 w-8 text-white" />
               </div>
@@ -200,7 +267,15 @@ export default function Landing() {
             </div>
 
             {/* AI Analysis */}
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.7s_forwards]">
+            <div 
+              ref={(el) => cardRefs.current[4] = el}
+              data-card-index="4"
+              className={`bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-500 hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-1 transform ${
+                visibleCards.has(4) 
+                  ? 'opacity-100 translate-y-0 scale-100' 
+                  : 'opacity-0 translate-y-8 scale-95'
+              }`}
+            >
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-purple-400/50">
                 <Eye className="h-8 w-8 text-white" />
               </div>
@@ -209,7 +284,15 @@ export default function Landing() {
             </div>
 
             {/* Debugging */}
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.9s_forwards]">
+            <div 
+              ref={(el) => cardRefs.current[5] = el}
+              data-card-index="5"
+              className={`bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-500 hover:shadow-xl hover:shadow-green-500/20 hover:-translate-y-1 transform ${
+                visibleCards.has(5) 
+                  ? 'opacity-100 translate-y-0 scale-100' 
+                  : 'opacity-0 translate-y-8 scale-95'
+              }`}
+            >
               <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-green-400/50">
                 <Bug className="h-8 w-8 text-white" />
               </div>
@@ -218,7 +301,15 @@ export default function Landing() {
             </div>
 
             {/* Community */}
-            <div className="bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/20 hover:-translate-y-1 opacity-0 animate-[fadeInUp_0.8s_ease-out_2.1s_forwards]">
+            <div 
+              ref={(el) => cardRefs.current[6] = el}
+              data-card-index="6"
+              className={`bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-500 hover:shadow-xl hover:shadow-orange-500/20 hover:-translate-y-1 transform ${
+                visibleCards.has(6) 
+                  ? 'opacity-100 translate-y-0 scale-100' 
+                  : 'opacity-0 translate-y-8 scale-95'
+              }`}
+            >
               <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-orange-400/50">
                 <Users className="h-8 w-8 text-white" />
               </div>
