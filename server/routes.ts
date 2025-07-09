@@ -414,6 +414,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           history: gameInstance.chess.history()
         });
 
+        // Clean up finished games from active games
+        if (newGameState.gameStatus === 'finished') {
+          activeGames.delete(roomId);
+          console.log(`Game ${roomId} finished and removed from active games`);
+        }
+
         console.log(`Move made in game ${roomId}: ${result.san}`);
       } catch (error) {
         console.error('Error making chess move:', error);
