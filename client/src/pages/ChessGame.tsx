@@ -64,6 +64,7 @@ export default function ChessGame() {
   const [possibleMoves, setPossibleMoves] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [capturedPieces, setCapturedPieces] = useState<{white: string[], black: string[]}>({white: [], black: []});
+  const [drawOffer, setDrawOffer] = useState<{from: string, username: string} | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch initial game data
@@ -128,6 +129,14 @@ export default function ChessGame() {
 
     newSocket.on('chat-message', (message: ChatMessage) => {
       setChatMessages(prev => [...prev, message]);
+    });
+
+    newSocket.on('draw-offer', (data: {from: string, username: string}) => {
+      setDrawOffer(data);
+    });
+
+    newSocket.on('draw-offer-declined', () => {
+      setDrawOffer(null);
     });
 
     newSocket.on('player-joined', (data: any) => {
@@ -240,10 +249,24 @@ export default function ChessGame() {
   const handleOfferDraw = () => {
     if (!socket || !user) return;
     
-    socket.emit('chess-offer-draw', {
+    socket.emit('offer-draw', {
       roomId,
       userId: user.id,
     });
+  };
+
+  const handleAcceptDraw = () => {
+    if (socket && user) {
+      socket.emit('accept-draw', { roomId, userId: user.id });
+      setDrawOffer(null);
+    }
+  };
+
+  const handleDeclineDraw = () => {
+    if (socket && user) {
+      socket.emit('decline-draw', { roomId, userId: user.id });
+      setDrawOffer(null);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -449,6 +472,37 @@ export default function ChessGame() {
                          getPlayerResult() === 'loser' ? '😔 You Lost' :
                          '🤝 Draw Game'}
                       </h2>
+                    </div>
+                  </div>
+                )}
+
+                {/* Draw Offer Notification */}
+                {drawOffer && drawOffer.from !== user?.id.toString() && (
+                  <div className="mb-6 p-4 rounded-lg bg-blue-600/20 border border-blue-500/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <HandHeart className="h-5 w-5 text-blue-400" />
+                        <span className="text-blue-300 font-medium">
+                          {drawOffer.username} offers a draw
+                        </span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button 
+                          size="sm" 
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={handleAcceptDraw}
+                        >
+                          Accept
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="border-red-500 text-red-400 hover:bg-red-600/20"
+                          onClick={handleDeclineDraw}
+                        >
+                          Decline
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 )}

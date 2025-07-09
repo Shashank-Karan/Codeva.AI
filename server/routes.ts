@@ -566,18 +566,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
 
-    // Handle draw offer
-    socket.on('chess-offer-draw', async (data) => {
+    // Handle draw offers
+    socket.on('offer-draw', async ({ roomId, userId }) => {
       try {
-        const { roomId, userId } = data;
-        
         const game = await storage.getChessGame(roomId);
-        if (!game) {
-          socket.emit('error', { message: 'Game not found' });
-          return;
-        }
+        if (!game) return;
 
-        // For simplicity, automatically accept draw offers
+        const user = await storage.getUser(userId.toString());
+        if (!user) return;
+
+        // Broadcast draw offer to the other player
+        socket.to(roomId).emit('draw-offer', {
+          from: userId.toString(),
+          username: user.username
+        });
+
+        console.log(`Draw offer from ${user.username} in game ${roomId}`);
+      } catch (error) {
+        console.error('Error offering draw:', error);
+      }
+    });
+
+    // Handle draw acceptance
+    socket.on('accept-draw', async ({ roomId, userId }) => {
+      try {
+        const game = await storage.getChessGame(roomId);
+        if (!game) return;
+
+        // Update game status to draw
         await storage.updateChessGame(roomId, {
           gameStatus: 'finished',
           winner: 'draw'
@@ -602,10 +618,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Clean up finished game from active games
         activeGames.delete(roomId);
-        console.log(`Draw agreed in game ${roomId} - game removed from active games`);
+        console.log(`Draw accepted in game ${roomId} - game removed from active games`);
       } catch (error) {
-        console.error('Error handling draw offer:', error);
-        socket.emit('error', { message: 'Failed to offer draw' });
+        console.error('Error accepting draw:', error);
+      }
+    });
+
+    // Handle draw decline
+    socket.on('decline-draw', async ({ roomId, userId }) => {
+      try {
+        // Notify the offering player that draw was declined
+        socket.to(roomId).emit('draw-offer-declined');
+        console.log(`Draw offer declined in game ${roomId}`);
+      } catch (error) {
+        console.error('Error declining draw:', error);
       }
     });
 
