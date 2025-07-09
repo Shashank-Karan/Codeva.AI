@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Crown, Users, Bot, Send, ArrowLeft, MessageSquare, Clock, Flag } from "lucide-react";
+import { Crown, Users, Bot, Send, ArrowLeft, MessageSquare, Clock, Flag, HandHeart } from "lucide-react";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
