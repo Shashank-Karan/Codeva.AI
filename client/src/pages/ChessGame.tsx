@@ -9,6 +9,7 @@ import { Crown, Users, Bot, Send, ArrowLeft, MessageSquare, Clock, Flag } from "
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import { Chess } from "chess.js";
 import { io, Socket } from "socket.io-client";
 import AppNavigation from "@/components/AppNavigation";
@@ -115,7 +116,8 @@ export default function ChessGame() {
     });
 
     newSocket.on('player-joined', (data: any) => {
-      setGameState(prev => prev ? { ...prev, ...data.gameState } : null);
+      // Refresh the game data when a player joins
+      queryClient.invalidateQueries({ queryKey: [`/api/chess/games/${roomId}`] });
     });
 
     newSocket.on('player-disconnected', (data: any) => {

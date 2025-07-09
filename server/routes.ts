@@ -317,15 +317,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         console.log(`User ${userId} joined game ${roomId}`);
         
-        // Notify other players
+        // Get updated game state after potential join
+        const updatedGame = await storage.getChessGame(roomId);
+        
+        // Send updated game state to all players in the room
+        io.to(roomId).emit('game-state', {
+          fen: gameInstance.chess.fen(),
+          turn: gameInstance.chess.turn(),
+          isCheck: gameInstance.chess.isCheck(),
+          isCheckmate: gameInstance.chess.isCheckmate(),
+          isStalemate: gameInstance.chess.isStalemate(),
+          isDraw: gameInstance.chess.isDraw(),
+          gameStatus: updatedGame?.gameStatus || game.gameStatus,
+          whitePlayer: updatedGame?.whitePlayer || game.whitePlayer,
+          blackPlayer: updatedGame?.blackPlayer || game.blackPlayer,
+          history: gameInstance.chess.history()
+        });
+        
+        // Notify other players about the join
         socket.to(roomId).emit('player-joined', {
           userId,
-          gameState: {
-            fen: gameInstance.chess.fen(),
-            turn: gameInstance.chess.turn(),
-            whitePlayer: game.whitePlayer,
-            blackPlayer: game.blackPlayer
-          }
+          whitePlayer: updatedGame?.whitePlayer || game.whitePlayer,
+          blackPlayer: updatedGame?.blackPlayer || game.blackPlayer
         });
       } catch (error) {
         console.error('Error joining chess game:', error);

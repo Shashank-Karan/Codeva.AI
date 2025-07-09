@@ -280,10 +280,25 @@ export class DatabaseStorage implements IStorage {
       throw new Error('Game is full');
     }
 
-    const updatedGame = await this.updateChessGame(roomId, {
-      blackPlayerId: parseInt(userId),
-      gameStatus: 'active',
-    });
+    // Check if user is already in the game
+    if (game.whitePlayerId?.toString() === userId || game.blackPlayerId?.toString() === userId) {
+      return game;
+    }
+
+    // Assign to available slot
+    const updateData: any = {};
+    if (!game.whitePlayerId) {
+      updateData.whitePlayerId = parseInt(userId);
+    } else if (!game.blackPlayerId) {
+      updateData.blackPlayerId = parseInt(userId);
+    }
+
+    // Only set to active if both players are present
+    if (game.whitePlayerId || game.blackPlayerId) {
+      updateData.gameStatus = 'active';
+    }
+
+    await this.updateChessGame(roomId, updateData);
 
     return await this.getChessGame(roomId) as ChessGameWithPlayers;
   }
@@ -292,7 +307,7 @@ export class DatabaseStorage implements IStorage {
     const games = await db
       .select()
       .from(chessGames)
-      .where(eq(chessGames.gameStatus, 'waiting'))
+      .where(sql`${chessGames.gameStatus} IN ('waiting', 'active')`)
       .orderBy(desc(chessGames.createdAt));
 
     const gamesWithPlayers = [];

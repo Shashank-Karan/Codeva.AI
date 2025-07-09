@@ -250,15 +250,26 @@ function GameCard({ game }: { game: ChessGame }) {
                 disabled={isJoining}
               >
                 <Play className="h-4 w-4 mr-2" />
-                {isJoining ? 'Joining...' : 'Join'}
+                {isJoining ? 'Joining...' : 'Join Game'}
               </Button>
             )}
             <Link href={`/chess/game/${game.roomId}`}>
               <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
                 <MessageSquare className="h-4 w-4 mr-2" />
-                {game.gameStatus === 'waiting' ? 'Watch' : 'View'}
+                {game.gameStatus === 'waiting' ? 'Spectate' : 'View Game'}
               </Button>
             </Link>
+            <Button 
+              size="sm" 
+              variant="ghost"
+              className="text-blue-400 hover:text-blue-300"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.origin + `/chess/game/${game.roomId}`);
+                // You could add a toast notification here
+              }}
+            >
+              Share Link
+            </Button>
           </div>
         </div>
       </div>
