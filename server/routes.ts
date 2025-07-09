@@ -557,7 +557,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           blackPlayer: game.blackPlayer
         });
 
-        console.log(`Player ${userId} resigned in game ${roomId}`);
+        // Clean up finished game from active games
+        activeGames.delete(roomId);
+        console.log(`Player ${userId} resigned in game ${roomId} - game removed from active games`);
       } catch (error) {
         console.error('Error handling resignation:', error);
         socket.emit('error', { message: 'Failed to resign' });
@@ -598,7 +600,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           blackPlayer: game.blackPlayer
         });
 
-        console.log(`Draw agreed in game ${roomId}`);
+        // Clean up finished game from active games
+        activeGames.delete(roomId);
+        console.log(`Draw agreed in game ${roomId} - game removed from active games`);
       } catch (error) {
         console.error('Error handling draw offer:', error);
         socket.emit('error', { message: 'Failed to offer draw' });
