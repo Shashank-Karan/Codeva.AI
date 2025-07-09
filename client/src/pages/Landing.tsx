@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code, Users, Bug, Eye, Menu } from "lucide-react";
+import { Crown, Users, Bot, Play, Trophy, Menu } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Landing() {
@@ -11,23 +11,34 @@ export default function Landing() {
         <div className="h-full w-full bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
       </div>
 
+      {/* Chess piece background elements */}
+      <div className="absolute top-20 left-10 text-amber-400/10 text-8xl font-serif hidden lg:block select-none">
+        ♛
+      </div>
+      <div className="absolute top-40 right-20 text-blue-400/10 text-6xl font-serif hidden lg:block select-none">
+        ♞
+      </div>
+      <div className="absolute bottom-40 left-20 text-purple-400/10 text-7xl font-serif hidden lg:block select-none">
+        ♜
+      </div>
+
       {/* Navigation */}
       <nav className="relative z-50 p-4 lg:p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-              <Code className="h-5 w-5 text-white" />
+            <div className="h-8 w-8 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-lg flex items-center justify-center">
+              <Crown className="h-5 w-5 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">CodeVis.ai</span>
+            <span className="text-2xl font-bold text-white">Chess Arena</span>
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <span className="text-blue-300 font-medium">Welcome to CodeFlow</span>
+            <span className="text-amber-300 font-medium">Master the Game</span>
           </div>
 
           <div className="flex items-center space-x-4">
             <Link href="/auth">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button className="bg-amber-600 hover:bg-amber-700 text-white">
                 Sign In
               </Button>
             </Link>
@@ -42,50 +53,41 @@ export default function Landing() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 pt-12 pb-20">
         <div className="text-center">
           {/* Badge */}
-          <div className="inline-flex items-center px-4 py-2 bg-blue-600/20 backdrop-blur-sm rounded-full text-blue-300 text-sm mb-8 border border-blue-500/20">
-            <div className="h-2 w-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
-            AI-Powered Code Analysis
+          <div className="inline-flex items-center px-4 py-2 bg-amber-600/20 backdrop-blur-sm rounded-full text-amber-300 text-sm mb-8 border border-amber-500/20">
+            <div className="h-2 w-2 bg-amber-400 rounded-full mr-2 animate-pulse"></div>
+            Real-Time Chess Platform
           </div>
 
           {/* Main heading */}
           <h1 className="text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            Visualize Code
+            Play Chess
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400">
               Like Never Before
             </span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-xl lg:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed">
-            Transform complex code into interactive visualizations with step-by-step explanations, 
-            live variable tracking, and intelligent flowcharts powered by AI.
+            Challenge players worldwide in real-time multiplayer matches, compete against AI opponents, 
+            and master your chess skills with our interactive platform.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/visualize">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
-                <Eye className="h-5 w-5 mr-2" />
-                Start Visualizing
+            <Link href="/auth">
+              <Button size="lg" className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+                <Play className="h-5 w-5 mr-2" />
+                Start Playing
               </Button>
             </Link>
-            <Link href="/community">
-              <Button size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
+            <Link href="/auth">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300">
                 <Users className="h-5 w-5 mr-2" />
-                Explore Community
+                Join Community
               </Button>
             </Link>
           </div>
-        </div>
-
-        {/* Decorative code elements */}
-        <div className="absolute top-20 left-10 text-blue-400/20 text-6xl font-mono hidden lg:block select-none">
-          &lt;/&gt;
-        </div>
-        <div className="absolute top-40 right-20 text-purple-400/20 text-4xl font-mono hidden lg:block select-none">
-          {'{'}
-          {'}'}
         </div>
       </div>
 
