@@ -163,6 +163,9 @@ export default function Chess() {
 }
 
 function GameCard({ game }: { game: ChessGame }) {
+  const { user } = useAuth();
+  const [isJoining, setIsJoining] = useState(false);
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'waiting': return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/20';
@@ -172,9 +175,46 @@ function GameCard({ game }: { game: ChessGame }) {
     }
   };
 
+  const canJoin = () => {
+    if (!user) return false;
+    if (game.gameStatus !== 'waiting') return false;
+    if (game.whitePlayer?.id === user.id || game.blackPlayer?.id === user.id) return false;
+    return !game.whitePlayer || !game.blackPlayer;
+  };
+
+  const handleJoinGame = async () => {
+    if (!canJoin()) return;
+    
+    setIsJoining(true);
+    try {
+      const response = await fetch(`/api/chess/games/${game.roomId}/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (response.ok) {
+        // Refresh the games list
+        queryClient.invalidateQueries({ queryKey: ['/api/chess/games'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/chess/user/games'] });
+        
+        // Navigate to the game
+        window.location.href = `/chess/game/${game.roomId}`;
+      } else {
+        console.error('Failed to join game');
+      }
+    } catch (error) {
+      console.error('Error joining game:', error);
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
   return (
     <div className="bg-slate-900/40 border border-slate-600/50 rounded-lg p-4 hover:bg-slate-900/60 transition-colors">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             {game.gameType === 'ai' ? (
@@ -195,18 +235,31 @@ function GameCard({ game }: { game: ChessGame }) {
             </Badge>
           )}
         </div>
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
           <div className="text-sm text-gray-400">
             <span className="text-white">{game.whitePlayer?.username || 'Waiting...'}</span>
             <span className="mx-2">vs</span>
             <span className="text-white">{game.blackPlayer?.username || 'Waiting...'}</span>
           </div>
-          <Link href={`/chess/game/${game.roomId}`}>
-            <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-              <Play className="h-4 w-4 mr-2" />
-              {game.gameStatus === 'waiting' ? 'Join' : 'Watch'}
-            </Button>
-          </Link>
+          <div className="flex space-x-2">
+            {canJoin() && (
+              <Button 
+                size="sm" 
+                className="bg-green-600 hover:bg-green-700"
+                onClick={handleJoinGame}
+                disabled={isJoining}
+              >
+                <Play className="h-4 w-4 mr-2" />
+                {isJoining ? 'Joining...' : 'Join'}
+              </Button>
+            )}
+            <Link href={`/chess/game/${game.roomId}`}>
+              <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                {game.gameStatus === 'waiting' ? 'Watch' : 'View'}
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

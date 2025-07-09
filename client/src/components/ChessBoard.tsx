@@ -86,12 +86,12 @@ export default function ChessBoard({
   const isSquarePossibleMove = (square: string) => possibleMoves.includes(square);
 
   return (
-    <div className="inline-block bg-amber-900 p-4 rounded-lg shadow-2xl">
+    <div className="inline-block bg-amber-900 p-2 sm:p-4 rounded-lg shadow-2xl max-w-full">
       {/* Rank labels (left side) */}
       <div className="flex">
-        <div className="flex flex-col justify-center mr-2">
+        <div className="flex flex-col justify-center mr-1 sm:mr-2">
           {displayRanks.map((rank) => (
-            <div key={rank} className="h-12 flex items-center text-amber-200 font-bold text-sm">
+            <div key={rank} className="h-8 sm:h-12 flex items-center text-amber-200 font-bold text-xs sm:text-sm">
               {rank}
             </div>
           ))}
@@ -111,7 +111,7 @@ export default function ChessBoard({
                   <div
                     key={square}
                     className={`
-                      w-12 h-12 relative cursor-pointer
+                      w-8 h-8 sm:w-12 sm:h-12 relative cursor-pointer
                       ${getSquareColor(file, rank)}
                       ${isSelected ? 'ring-2 ring-blue-500' : ''}
                       ${isPossibleMove ? 'ring-2 ring-green-500' : ''}
@@ -122,14 +122,14 @@ export default function ChessBoard({
                     {/* Possible move indicator */}
                     {isPossibleMove && !piece && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-3 h-3 bg-green-500 rounded-full opacity-60"></div>
+                        <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-500 rounded-full opacity-60"></div>
                       </div>
                     )}
                     
                     {/* Piece */}
                     {piece && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-4xl select-none">
+                        <span className="text-2xl sm:text-4xl select-none">
                           {pieceSymbols[piece]}
                         </span>
                       </div>
@@ -153,9 +153,9 @@ export default function ChessBoard({
       </div>
       
       {/* File labels (bottom) */}
-      <div className="flex justify-center mt-2 ml-6">
+      <div className="flex justify-center mt-1 sm:mt-2 ml-3 sm:ml-6">
         {displayFiles.map((file) => (
-          <div key={file} className="w-12 text-center text-amber-200 font-bold text-sm">
+          <div key={file} className="w-8 sm:w-12 text-center text-amber-200 font-bold text-xs sm:text-sm">
             {file}
           </div>
         ))}

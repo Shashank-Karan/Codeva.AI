@@ -352,8 +352,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Validate turn
         const isWhiteTurn = gameInstance.chess.turn() === 'w';
-        const isWhitePlayer = game.whitePlayerId?.toString() === userId;
-        const isBlackPlayer = game.blackPlayerId?.toString() === userId;
+        const isWhitePlayer = game.whitePlayer?.id?.toString() === userId;
+        const isBlackPlayer = game.blackPlayer?.id?.toString() === userId;
 
         if ((isWhiteTurn && !isWhitePlayer) || (!isWhiteTurn && !isBlackPlayer)) {
           socket.emit('error', { message: 'Not your turn' });
@@ -368,14 +368,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Update game state in database
-        const newGameState = {
-          currentFen: gameInstance.chess.fen(),
-          gameState: {
-            moves: gameInstance.chess.history(),
-            turn: gameInstance.chess.turn(),
-            history: gameInstance.chess.history({ verbose: true })
-          },
-          moveHistory: gameInstance.chess.history()
+        const newGameState: any = {
+          currentFen: gameInstance.chess.fen()
         };
 
         // Check for game end
@@ -387,6 +381,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             newGameState.gameStatus = 'finished';
             newGameState.winner = 'draw';
           }
+        } else if (game.gameStatus === 'waiting' && game.whitePlayer && game.blackPlayer) {
+          newGameState.gameStatus = 'active';
         }
 
         await storage.updateChessGame(roomId, newGameState);
@@ -474,14 +470,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         if (result) {
           // Update game state in database
-          const newGameState = {
-            currentFen: gameInstance.chess.fen(),
-            gameState: {
-              moves: gameInstance.chess.history(),
-              turn: gameInstance.chess.turn(),
-              history: gameInstance.chess.history({ verbose: true })
-            },
-            moveHistory: gameInstance.chess.history()
+          const newGameState: any = {
+            currentFen: gameInstance.chess.fen()
           };
 
           await storage.updateChessGame(roomId, newGameState);

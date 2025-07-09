@@ -149,29 +149,35 @@ export default function ChessGame() {
     if (!isPlayerTurn) return;
 
     if (selectedSquare) {
-      // Try to make a move
-      const move = chess.move({
-        from: selectedSquare,
-        to: square,
-        promotion: 'q', // Always promote to queen for simplicity
-      });
-
-      if (move) {
-        socket?.emit('chess-move', {
-          roomId,
-          move: { from: selectedSquare, to: square, promotion: 'q' },
-          userId: user.id,
+      // Try to make a move - use a temporary chess instance to validate
+      const tempChess = new Chess(gameState.fen);
+      try {
+        const move = tempChess.move({
+          from: selectedSquare,
+          to: square,
+          promotion: 'q', // Always promote to queen for simplicity
         });
+
+        if (move) {
+          socket?.emit('chess-move', {
+            roomId,
+            move: { from: selectedSquare, to: square, promotion: 'q' },
+            userId: user.id,
+          });
+        }
+      } catch (error) {
+        console.log('Invalid move:', error);
       }
       
       setSelectedSquare(null);
       setPossibleMoves([]);
     } else {
-      // Select a piece
-      const piece = chess.get(square);
+      // Select a piece - use current game state
+      const tempChess = new Chess(gameState.fen);
+      const piece = tempChess.get(square);
       if (piece && piece.color === gameState.turn) {
         setSelectedSquare(square);
-        const moves = chess.moves({ square, verbose: true });
+        const moves = tempChess.moves({ square, verbose: true });
         setPossibleMoves(moves.map(move => move.to));
       }
     }
@@ -288,17 +294,17 @@ export default function ChessGame() {
         </div>
 
         {/* Game Layout */}
-        <div className="grid lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Chess Board */}
-          <div className="lg:col-span-3">
+          <div className="xl:col-span-3">
             <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700">
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                   <CardTitle className="text-white flex items-center">
                     <Crown className="h-5 w-5 mr-2" />
                     Chess Game
                   </CardTitle>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {gameState?.turn && (
                       <Badge variant="outline" className="text-white">
                         {gameState.turn === 'w' ? 'White' : 'Black'} to move
@@ -313,12 +319,12 @@ export default function ChessGame() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   {/* Black player info */}
                   <div className="bg-slate-700/50 rounded-lg p-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-slate-900 rounded-full"></div>
-                      <span className="text-white font-medium">
+                      <span className="text-white font-medium text-sm sm:text-base">
                         {gameData.blackPlayer?.username || 'Waiting...'}
                       </span>
                     </div>
@@ -352,7 +358,7 @@ export default function ChessGame() {
                   <div className="bg-slate-100/10 rounded-lg p-3">
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-white rounded-full"></div>
-                      <span className="text-white font-medium">
+                      <span className="text-white font-medium text-sm sm:text-base">
                         {gameData.whitePlayer?.username || 'Waiting...'}
                       </span>
                     </div>
@@ -360,19 +366,21 @@ export default function ChessGame() {
                 </div>
 
                 {/* Chess Board */}
-                <div className="flex justify-center">
-                  <ChessBoard
-                    position={gameState?.fen || chess.fen()}
-                    onSquareClick={handleSquareClick}
-                    selectedSquare={selectedSquare}
-                    possibleMoves={possibleMoves}
-                    orientation={getPlayerColor(user?.id) || 'white'}
-                  />
+                <div className="flex justify-center mb-6">
+                  <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl">
+                    <ChessBoard
+                      position={gameState?.fen || chess.fen()}
+                      onSquareClick={handleSquareClick}
+                      selectedSquare={selectedSquare}
+                      possibleMoves={possibleMoves}
+                      orientation={getPlayerColor(user?.id) || 'white'}
+                    />
+                  </div>
                 </div>
 
                 {/* AI Move Button */}
                 {gameData.gameType === 'ai' && gameState?.turn === 'b' && (
-                  <div className="flex justify-center mt-4">
+                  <div className="flex justify-center">
                     <Button
                       onClick={handleRequestAIMove}
                       disabled={gameState?.gameStatus !== 'active'}
@@ -388,8 +396,8 @@ export default function ChessGame() {
           </div>
 
           {/* Chat Panel */}
-          <div className="lg:col-span-1">
-            <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700 h-full">
+          <div className="xl:col-span-1">
+            <Card className="bg-slate-800/50 backdrop-blur-sm border-slate-700">
               <CardHeader className="pb-3">
                 <CardTitle className="text-white flex items-center text-sm">
                   <MessageSquare className="h-4 w-4 mr-2" />
@@ -397,7 +405,7 @@ export default function ChessGame() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="flex flex-col h-96">
+                <div className="flex flex-col h-80 xl:h-96">
                   {/* Chat Messages */}
                   <ScrollArea className="flex-1 px-4">
                     <div className="space-y-3">
@@ -409,7 +417,7 @@ export default function ChessGame() {
                           }`}
                         >
                           <div
-                            className={`max-w-xs rounded-lg px-3 py-2 ${
+                            className={`max-w-[240px] rounded-lg px-3 py-2 ${
                               message.user?.id === user?.id
                                 ? 'bg-blue-600 text-white'
                                 : 'bg-slate-700 text-gray-300'
@@ -418,7 +426,7 @@ export default function ChessGame() {
                             <div className="font-medium text-xs mb-1">
                               {message.user?.username || 'System'}
                             </div>
-                            <div className="text-sm">{message.message}</div>
+                            <div className="text-sm break-words">{message.message}</div>
                           </div>
                         </div>
                       ))}
