@@ -14,6 +14,12 @@ import Community from "./pages/Community";
 import Chess from "./pages/Chess";
 import ChessGame from "./pages/ChessGame";
 import Games from "./pages/Games";
+import Timer from "./pages/Timer";
+import Calculator from "./pages/Calculator";
+import Notes from "./pages/Notes";
+import Tools from "./pages/Tools";
+import Puzzles from "./pages/Puzzles";
+import Settings from "./pages/Settings";
 import AuthPageSimple from "@/pages/auth-page-simple";
 import SimpleAuthTest from "@/pages/simple-auth-test";
 import NotFound from "@/pages/not-found";
@@ -43,6 +49,12 @@ function Router() {
           <Route path="/chess" component={Chess} />
           <Route path="/chess/game/:roomId" component={ChessGame} />
           <Route path="/games" component={Games} />
+          <Route path="/timer" component={Timer} />
+          <Route path="/calculator" component={Calculator} />
+          <Route path="/notes" component={Notes} />
+          <Route path="/tools" component={Tools} />
+          <Route path="/puzzles" component={Puzzles} />
+          <Route path="/settings" component={Settings} />
 
         </>
       ) : (
@@ -81,6 +93,36 @@ function Router() {
           <Route path="/games">
             <ProtectedRoute>
               <Games />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/timer">
+            <ProtectedRoute>
+              <Timer />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/calculator">
+            <ProtectedRoute>
+              <Calculator />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/notes">
+            <ProtectedRoute>
+              <Notes />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/tools">
+            <ProtectedRoute>
+              <Tools />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/puzzles">
+            <ProtectedRoute>
+              <Puzzles />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/settings">
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           </Route>
         </>
