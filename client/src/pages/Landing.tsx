@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code, Users, Bug, Eye, Menu, GitBranch, Zap, Terminal } from "lucide-react";
+import { Code, Users, Bug, Eye, Menu, GitBranch, Zap, Terminal, Crown } from "lucide-react";
 import { Link } from "wouter";
 import { useEffect, useState, useRef } from "react";
 
@@ -93,11 +93,11 @@ export default function Landing() {
             <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
               <Code className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl sm:text-2xl font-bold text-white">CodeVis.ai</span>
+            <span className="text-xl sm:text-2xl font-bold text-white">Codeva.AI</span>
           </div>
 
           <div className="hidden md:flex items-center space-x-8">
-            <span className="text-blue-300 font-medium">Welcome to CodeFlow</span>
+            <span className="text-blue-300 font-medium">Welcome to Codeva</span>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -119,7 +119,7 @@ export default function Landing() {
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 bg-blue-600/20 backdrop-blur-sm rounded-full text-blue-300 text-sm mb-6 sm:mb-8 border border-blue-500/20 animate-[float_3s_ease-in-out_infinite_1s]">
             <div className="h-2 w-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
-            AI-Powered Code Analysis
+            AI-Powered Code Analysis & Chess Gaming
           </div>
 
           {/* Main heading with floating and glowing effect */}
@@ -141,7 +141,7 @@ export default function Landing() {
           {/* Subtitle */}
           <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-10 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-4">
             Transform complex code into interactive visualizations with step-by-step explanations, 
-            live variable tracking, and intelligent flowcharts powered by AI.
+            plus enjoy strategic chess gameplay with AI opponents and multiplayer matches.
           </p>
 
           {/* CTA Buttons */}
@@ -150,6 +150,12 @@ export default function Landing() {
               <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <Eye className="h-5 w-5 mr-2" />
                 Start Visualizing
+              </Button>
+            </Link>
+            <Link href="/chess">
+              <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <Crown className="h-5 w-5 mr-2" />
+                Play Chess
               </Button>
             </Link>
             <Link href="/community">
@@ -164,12 +170,12 @@ export default function Landing() {
 
       {/* Features Section */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-6 pb-16 sm:pb-20">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Visualize Card */}
           <Card 
             ref={(el) => cardRefs.current[0] = el}
             data-card-index="0"
-            className={`bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-500 group hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 sm:col-span-2 lg:col-span-1 transform ${
+            className={`bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-500 group hover:shadow-2xl hover:shadow-blue-500/20 hover:-translate-y-1 transform ${
               visibleCards.has(0) 
                 ? 'opacity-100 translate-y-0 scale-100' 
                 : 'opacity-0 translate-y-8 scale-95'
@@ -217,7 +223,7 @@ export default function Landing() {
           <Card 
             ref={(el) => cardRefs.current[2] = el}
             data-card-index="2"
-            className={`bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-500 group hover:shadow-2xl hover:shadow-green-500/20 hover:-translate-y-1 sm:col-span-2 lg:col-span-1 transform ${
+            className={`bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-500 group hover:shadow-2xl hover:shadow-green-500/20 hover:-translate-y-1 transform ${
               visibleCards.has(2) 
                 ? 'opacity-100 translate-y-0 scale-100' 
                 : 'opacity-0 translate-y-8 scale-95'
@@ -233,6 +239,30 @@ export default function Landing() {
               <CardDescription className="text-gray-300 text-sm sm:text-base leading-relaxed">
                 AI-powered code debugging that automatically detects errors, suggests fixes, 
                 and provides detailed explanations to help you write better, cleaner code.
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          {/* Chess Card */}
+          <Card 
+            ref={(el) => cardRefs.current[3] = el}
+            data-card-index="3"
+            className={`bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-800/60 transition-all duration-500 group hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-1 transform ${
+              visibleCards.has(3) 
+                ? 'opacity-100 translate-y-0 scale-100' 
+                : 'opacity-0 translate-y-8 scale-95'
+            }`}
+          >
+            <CardHeader className="pb-4">
+              <div className="h-16 w-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg group-hover:shadow-amber-400/50">
+                <Crown className="h-8 w-8 text-white" />
+              </div>
+              <CardTitle className="text-white text-xl sm:text-2xl font-bold">Chess</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                Challenge AI opponents or play against friends in real-time multiplayer chess matches. 
+                Features include game history, ratings, and interactive chess tutorials.
               </CardDescription>
             </CardContent>
           </Card>
@@ -254,10 +284,10 @@ export default function Landing() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 sm:mb-16">
             {/* Code Input */}
             <div 
-              ref={(el) => cardRefs.current[3] = el}
-              data-card-index="3"
+              ref={(el) => cardRefs.current[4] = el}
+              data-card-index="4"
               className={`bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/20 hover:-translate-y-1 transform ${
-                visibleCards.has(3) 
+                visibleCards.has(4) 
                   ? 'opacity-100 translate-y-0 scale-100' 
                   : 'opacity-0 translate-y-8 scale-95'
               }`}
@@ -271,10 +301,10 @@ export default function Landing() {
 
             {/* AI Analysis */}
             <div 
-              ref={(el) => cardRefs.current[4] = el}
-              data-card-index="4"
+              ref={(el) => cardRefs.current[5] = el}
+              data-card-index="5"
               className={`bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-500 hover:shadow-xl hover:shadow-purple-500/20 hover:-translate-y-1 transform ${
-                visibleCards.has(4) 
+                visibleCards.has(5) 
                   ? 'opacity-100 translate-y-0 scale-100' 
                   : 'opacity-0 translate-y-8 scale-95'
               }`}
@@ -288,10 +318,10 @@ export default function Landing() {
 
             {/* Debugging */}
             <div 
-              ref={(el) => cardRefs.current[5] = el}
-              data-card-index="5"
+              ref={(el) => cardRefs.current[6] = el}
+              data-card-index="6"
               className={`bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-500 hover:shadow-xl hover:shadow-green-500/20 hover:-translate-y-1 transform ${
-                visibleCards.has(5) 
+                visibleCards.has(6) 
                   ? 'opacity-100 translate-y-0 scale-100' 
                   : 'opacity-0 translate-y-8 scale-95'
               }`}
@@ -305,10 +335,10 @@ export default function Landing() {
 
             {/* Community */}
             <div 
-              ref={(el) => cardRefs.current[6] = el}
-              data-card-index="6"
+              ref={(el) => cardRefs.current[7] = el}
+              data-card-index="7"
               className={`bg-slate-900/40 border border-slate-700/50 rounded-xl p-6 text-center group hover:bg-slate-900/60 transition-all duration-500 hover:shadow-xl hover:shadow-orange-500/20 hover:-translate-y-1 transform ${
-                visibleCards.has(6) 
+                visibleCards.has(7) 
                   ? 'opacity-100 translate-y-0 scale-100' 
                   : 'opacity-0 translate-y-8 scale-95'
               }`}
