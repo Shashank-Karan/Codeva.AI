@@ -76,60 +76,264 @@ interface SpotErrorGame {
   language: string;
 }
 
-// Sample game data
-const fixTheBugGames: FixTheBugGame[] = [
+// Dynamic question generation templates
+const fixTheBugTemplates = [
   {
-    id: 1,
-    title: "Missing Colon in If Statement",
-    description: "Fix the syntax error in this Python if statement",
-    buggyCode: `name = "Alice"
-if name == "Alice"
-    print("Hello Alice!")`,
-    correctCode: `name = "Alice"
-if name == "Alice":
-    print("Hello Alice!")`,
-    hint: "Python if statements need a colon (:) at the end",
-    language: "python"
+    type: "missing_colon",
+    generateQuestion: () => {
+      const names = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank"];
+      const conditions = ["==", "!=", "in", "not in"];
+      const messages = ["Hello", "Welcome", "Goodbye", "Hi there", "Nice to meet you"];
+      
+      const name = names[Math.floor(Math.random() * names.length)];
+      const condition = conditions[Math.floor(Math.random() * conditions.length)];
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      
+      const buggyCode = `name = "${name}"
+if name ${condition} "${name}"
+    print("${message} ${name}!")`;
+      
+      const correctCode = `name = "${name}"
+if name ${condition} "${name}":
+    print("${message} ${name}!")`;
+      
+      return {
+        id: Date.now(),
+        title: "Missing Colon in If Statement",
+        description: "Fix the syntax error in this Python if statement",
+        buggyCode,
+        correctCode,
+        hint: "Python if statements need a colon (:) at the end",
+        language: "python"
+      };
+    }
   },
   {
-    id: 2,
-    title: "Indentation Error",
-    description: "Fix the indentation in this Python function",
-    buggyCode: `def greet(name):
-print(f"Hello {name}!")
-return "Done"`,
-    correctCode: `def greet(name):
-    print(f"Hello {name}!")
-    return "Done"`,
-    hint: "Python uses indentation to define code blocks",
-    language: "python"
+    type: "indentation_error",
+    generateQuestion: () => {
+      const functions = ["greet", "welcome", "calculate", "process", "handle"];
+      const params = ["name", "user", "value", "data", "input"];
+      const actions = ["print", "return", "process", "calculate", "validate"];
+      
+      const func = functions[Math.floor(Math.random() * functions.length)];
+      const param = params[Math.floor(Math.random() * params.length)];
+      const action = actions[Math.floor(Math.random() * actions.length)];
+      
+      const buggyCode = `def ${func}(${param}):
+${action}(f"Processing {${param}}!")
+return "Done"`;
+      
+      const correctCode = `def ${func}(${param}):
+    ${action}(f"Processing {${param}}!")
+    return "Done"`;
+      
+      return {
+        id: Date.now(),
+        title: "Indentation Error",
+        description: "Fix the indentation in this Python function",
+        buggyCode,
+        correctCode,
+        hint: "Python uses indentation to define code blocks",
+        language: "python"
+      };
+    }
+  },
+  {
+    type: "missing_parentheses",
+    generateQuestion: () => {
+      const messages = ["Hello World", "Python is fun", "Learning coding", "Debug this code"];
+      const message = messages[Math.floor(Math.random() * messages.length)];
+      
+      const buggyCode = `print"${message}"`;
+      const correctCode = `print("${message}")`;
+      
+      return {
+        id: Date.now(),
+        title: "Missing Parentheses",
+        description: "Fix the missing parentheses in this print statement",
+        buggyCode,
+        correctCode,
+        hint: "Function calls need parentheses around arguments",
+        language: "python"
+      };
+    }
   }
 ];
 
-const predictOutputGames: PredictOutputGame[] = [
+const predictOutputTemplates = [
   {
-    id: 1,
-    title: "List Slicing",
-    code: `numbers = [1, 2, 3, 4, 5]
-print(numbers[1:4])`,
-    options: ["[1, 2, 3]", "[2, 3, 4]", "[1, 2, 3, 4]", "[2, 3, 4, 5]"],
-    correctAnswer: 1,
-    explanation: "List slicing [1:4] starts at index 1 and goes up to (but not including) index 4",
-    language: "python"
+    type: "list_slicing",
+    generateQuestion: () => {
+      const lists = [
+        [1, 2, 3, 4, 5],
+        [10, 20, 30, 40, 50],
+        ['a', 'b', 'c', 'd', 'e'],
+        [100, 200, 300, 400, 500]
+      ];
+      
+      const list = lists[Math.floor(Math.random() * lists.length)];
+      const start = Math.floor(Math.random() * 3);
+      const end = start + 2 + Math.floor(Math.random() * 2);
+      
+      const sliced = list.slice(start, end);
+      const code = `numbers = ${JSON.stringify(list)}
+print(numbers[${start}:${end}])`;
+      
+      const correctAnswer = JSON.stringify(sliced);
+      const wrongOptions = [
+        JSON.stringify(list.slice(start, end + 1)),
+        JSON.stringify(list.slice(start - 1, end)),
+        JSON.stringify(list.slice(0, end))
+      ];
+      
+      const options = [correctAnswer, ...wrongOptions].sort(() => Math.random() - 0.5);
+      
+      return {
+        id: Date.now(),
+        title: "List Slicing",
+        code,
+        options,
+        correctAnswer: options.indexOf(correctAnswer),
+        explanation: `List slicing [${start}:${end}] starts at index ${start} and goes up to (but not including) index ${end}`,
+        language: "python"
+      };
+    }
   },
   {
-    id: 2,
-    title: "String Concatenation",
-    code: `x = "Hello"
-y = "World"
-print(x + " " + y)`,
-    options: ["HelloWorld", "Hello World", "Hello+World", "Error"],
-    correctAnswer: 1,
-    explanation: "String concatenation with + joins the strings together",
-    language: "python"
+    type: "arithmetic",
+    generateQuestion: () => {
+      const operations = ["+", "-", "*", "//"];
+      const op = operations[Math.floor(Math.random() * operations.length)];
+      const a = Math.floor(Math.random() * 20) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      
+      let result;
+      switch(op) {
+        case "+": result = a + b; break;
+        case "-": result = a - b; break;
+        case "*": result = a * b; break;
+        case "//": result = Math.floor(a / b); break;
+      }
+      
+      const code = `x = ${a}
+y = ${b}
+print(x ${op} y)`;
+      
+      const options = [
+        result.toString(),
+        (result + 1).toString(),
+        (result - 1).toString(),
+        (result * 2).toString()
+      ].sort(() => Math.random() - 0.5);
+      
+      return {
+        id: Date.now(),
+        title: "Arithmetic Operations",
+        code,
+        options,
+        correctAnswer: options.indexOf(result.toString()),
+        explanation: `${a} ${op} ${b} equals ${result}`,
+        language: "python"
+      };
+    }
   }
 ];
 
+const fillBlankTemplates = [
+  {
+    type: "for_loop",
+    generateQuestion: () => {
+      const ranges = [5, 10, 3, 7, 8];
+      const range = ranges[Math.floor(Math.random() * ranges.length)];
+      
+      return {
+        id: Date.now(),
+        title: "For Loop Range",
+        codeTemplate: `for i in _____(${range}):
+    print(i)`,
+        missingWord: "range",
+        hint: "Function used to generate a sequence of numbers",
+        language: "python"
+      };
+    }
+  },
+  {
+    type: "conditional",
+    generateQuestion: () => {
+      const conditions = [
+        { var: "age", val: 18, check: ">=", action: "vote" },
+        { var: "score", val: 60, check: ">=", action: "pass" },
+        { var: "temp", val: 0, check: "<", action: "freeze" }
+      ];
+      
+      const condition = conditions[Math.floor(Math.random() * conditions.length)];
+      
+      return {
+        id: Date.now(),
+        title: "Conditional Statement",
+        codeTemplate: `${condition.var} = ${condition.val}
+___ ${condition.var} ${condition.check} ${condition.val}:
+    print("You can ${condition.action}!")`,
+        missingWord: "if",
+        hint: "Keyword used for conditional statements",
+        language: "python"
+      };
+    }
+  }
+];
+
+const spotErrorTemplates = [
+  {
+    type: "undefined_variable",
+    generateQuestion: () => {
+      const variables = [
+        { correct: "user_name", wrong: "username" },
+        { correct: "first_name", wrong: "firstname" },
+        { correct: "last_name", wrong: "lastname" }
+      ];
+      
+      const variable = variables[Math.floor(Math.random() * variables.length)];
+      
+      const codeLines = [
+        `${variable.correct} = "John"`,
+        `age = 25`,
+        `print(f"Hello {${variable.wrong}}!")`,
+        `print(f"You are {age} years old")`
+      ];
+      
+      return {
+        id: Date.now(),
+        title: "Variable Name Error",
+        codeLines,
+        errorLineIndex: 2,
+        explanation: `Variable '${variable.wrong}' is not defined. It should be '${variable.correct}'`,
+        language: "python"
+      };
+    }
+  }
+];
+
+// Generate initial questions
+const generateNewQuestion = (gameType: string) => {
+  switch(gameType) {
+    case "fix-bug":
+      const bugTemplate = fixTheBugTemplates[Math.floor(Math.random() * fixTheBugTemplates.length)];
+      return bugTemplate.generateQuestion();
+    case "predict-output":
+      const predictTemplate = predictOutputTemplates[Math.floor(Math.random() * predictOutputTemplates.length)];
+      return predictTemplate.generateQuestion();
+    case "fill-blank":
+      const fillTemplate = fillBlankTemplates[Math.floor(Math.random() * fillBlankTemplates.length)];
+      return fillTemplate.generateQuestion();
+    case "spot-error":
+      const spotTemplate = spotErrorTemplates[Math.floor(Math.random() * spotErrorTemplates.length)];
+      return spotTemplate.generateQuestion();
+    default:
+      return null;
+  }
+};
+
+// Dynamic drag-drop game generation
 const dragDropGames: DragDropGame[] = [
   {
     id: 1,
@@ -151,43 +355,11 @@ const dragDropGames: DragDropGame[] = [
   }
 ];
 
-const fillBlankGames: FillBlankGame[] = [
-  {
-    id: 1,
-    title: "For Loop Range",
-    codeTemplate: `for i in _____(5):
-    print(i)`,
-    missingWord: "range",
-    hint: "Function used to generate a sequence of numbers",
-    language: "python"
-  },
-  {
-    id: 2,
-    title: "Conditional Statement",
-    codeTemplate: `age = 18
-___ age >= 18:
-    print("You can vote!")`,
-    missingWord: "if",
-    hint: "Keyword used for conditional statements",
-    language: "python"
-  }
-];
-
-const spotErrorGames: SpotErrorGame[] = [
-  {
-    id: 1,
-    title: "Variable Name Error",
-    codeLines: [
-      "user_name = \"John\"",
-      "user_age = 25", 
-      "print(f\"Hello {username}!\")",
-      "print(f\"You are {user_age} years old\")"
-    ],
-    errorLineIndex: 2,
-    explanation: "Variable 'username' is not defined. It should be 'user_name' (with underscore)",
-    language: "python"
-  }
-];
+// Initial questions using dynamic generation
+const fixTheBugGames: FixTheBugGame[] = [generateNewQuestion("fix-bug") as FixTheBugGame];
+const predictOutputGames: PredictOutputGame[] = [generateNewQuestion("predict-output") as PredictOutputGame];
+const fillBlankGames: FillBlankGame[] = [generateNewQuestion("fill-blank") as FillBlankGame];
+const spotErrorGames: SpotErrorGame[] = [generateNewQuestion("spot-error") as SpotErrorGame];
 
 export default function Games() {
   const [activeGame, setActiveGame] = useState("fix-bug");
