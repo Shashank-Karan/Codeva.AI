@@ -518,74 +518,166 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="relative z-10 bg-slate-900/80 backdrop-blur-sm border-t border-slate-700/30">
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-16">
-          <div className="grid md:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div className="md:col-span-1">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                  <Code className="h-5 w-5 text-white" />
+      {/* Anime-Style Footer */}
+      <footer className="relative z-10 bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-1/4 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 right-1/4 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-cyan-500/20 rounded-full blur-2xl animate-bounce"></div>
+        </div>
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+          <div className="absolute top-32 right-20 w-1 h-1 bg-purple-400 rounded-full animate-bounce delay-500"></div>
+          <div className="absolute bottom-20 left-1/3 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse delay-1000"></div>
+          <div className="absolute bottom-32 right-1/3 w-1 h-1 bg-pink-400 rounded-full animate-bounce delay-1500"></div>
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+            {/* Brand Section */}
+            <div className="sm:col-span-2 lg:col-span-1">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="relative">
+                  <div className="h-10 w-10 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <Code className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="absolute -inset-1 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-xl blur opacity-30 animate-pulse"></div>
                 </div>
-                <span className="text-xl font-bold text-white">Codeva.AI</span>
+                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  Codeva.AI
+                </span>
               </div>
-              <p className="text-gray-400 text-sm leading-relaxed">
+              <p className="text-gray-300 text-sm leading-relaxed mb-6">
                 Transforming code understanding through AI-powered visualization and community collaboration.
               </p>
             </div>
 
             {/* Features */}
             <div>
-              <h4 className="text-white font-semibold mb-4">Features</h4>
-              <ul className="space-y-2">
-                <li><Link href="/visualize" className="text-gray-400 hover:text-white transition-colors text-sm">Code Visualization</Link></li>
-                <li><Link href="/debug" className="text-gray-400 hover:text-white transition-colors text-sm">AI Debugging</Link></li>
-                <li><Link href="/community" className="text-gray-400 hover:text-white transition-colors text-sm">Developer Community</Link></li>
-                <li><Link href="/chess" className="text-gray-400 hover:text-white transition-colors text-sm">Chess Gaming</Link></li>
+              <h4 className="text-white font-semibold mb-4 text-lg">Features</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link href="/visualize" className="text-gray-400 hover:text-blue-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Code Visualization</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/debug" className="text-gray-400 hover:text-green-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>AI Debugging</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/community" className="text-gray-400 hover:text-purple-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-purple-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Developer Community</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/chess" className="text-gray-400 hover:text-amber-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-amber-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Chess Gaming</span>
+                  </Link>
+                </li>
               </ul>
             </div>
 
-            {/* Resources */}
+            {/* Tools */}
             <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Documentation</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Tutorials</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">API Reference</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Examples</a></li>
+              <h4 className="text-white font-semibold mb-4 text-lg">Tools</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link href="/calculator" className="text-gray-400 hover:text-cyan-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Calculator</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/timer" className="text-gray-400 hover:text-pink-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-pink-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Timer</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/notes" className="text-gray-400 hover:text-yellow-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Notes</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/games" className="text-gray-400 hover:text-red-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-red-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Learning Games</span>
+                  </Link>
+                </li>
               </ul>
             </div>
 
             {/* Connect */}
             <div>
-              <h4 className="text-white font-semibold mb-4">Connect</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">About Us</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Contact</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</a></li>
+              <h4 className="text-white font-semibold mb-4 text-lg">Connect</h4>
+              <ul className="space-y-3">
+                <li>
+                  <Link href="/chat" className="text-gray-400 hover:text-blue-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>AI Chat</span>
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-green-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-green-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Support</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-purple-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Feedback</span>
+                  </a>
+                </li>
+                <li>
+                  <Link href="/settings" className="text-gray-400 hover:text-amber-400 transition-colors text-sm flex items-center space-x-2 group">
+                    <div className="w-1.5 h-1.5 bg-amber-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <span>Settings</span>
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-slate-700/30 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              © 2025 Codeva.AI. All rights reserved.
-            </p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <span className="sr-only">GitHub</span>
-                <Code className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <span className="sr-only">Twitter</span>
-                <Users className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <span className="sr-only">Discord</span>
-                <Bug className="h-5 w-5" />
-              </a>
+          {/* Bottom Section */}
+          <div className="border-t border-slate-700/30 mt-12 pt-8">
+            <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+              <p className="text-gray-400 text-sm">
+                © 2025 <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent font-semibold">Codeva.AI</span>. All rights reserved.
+              </p>
+              
+              {/* Social Icons */}
+              <div className="flex space-x-4">
+                <a href="#" className="group relative">
+                  <div className="w-10 h-10 bg-slate-800/50 hover:bg-blue-500/20 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                    <Code className="h-5 w-5 text-gray-400 group-hover:text-blue-400" />
+                  </div>
+                  <div className="absolute -inset-1 bg-blue-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+                <a href="#" className="group relative">
+                  <div className="w-10 h-10 bg-slate-800/50 hover:bg-purple-500/20 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                    <Users className="h-5 w-5 text-gray-400 group-hover:text-purple-400" />
+                  </div>
+                  <div className="absolute -inset-1 bg-purple-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+                <a href="#" className="group relative">
+                  <div className="w-10 h-10 bg-slate-800/50 hover:bg-green-500/20 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110">
+                    <Bug className="h-5 w-5 text-gray-400 group-hover:text-green-400" />
+                  </div>
+                  <div className="absolute -inset-1 bg-green-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                </a>
+              </div>
             </div>
           </div>
         </div>
