@@ -20,6 +20,7 @@ import Notes from "./pages/Notes";
 import Tools from "./pages/Tools";
 import Puzzles from "./pages/Puzzles";
 import Settings from "./pages/Settings";
+import Others from "./pages/Others";
 import AuthPageSimple from "@/pages/auth-page-simple";
 import SimpleAuthTest from "@/pages/simple-auth-test";
 import NotFound from "@/pages/not-found";
@@ -55,6 +56,7 @@ function Router() {
           <Route path="/tools" component={Tools} />
           <Route path="/puzzles" component={Puzzles} />
           <Route path="/settings" component={Settings} />
+          <Route path="/others" component={Others} />
 
         </>
       ) : (
@@ -123,6 +125,11 @@ function Router() {
           <Route path="/settings">
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/others">
+            <ProtectedRoute>
+              <Others />
             </ProtectedRoute>
           </Route>
         </>

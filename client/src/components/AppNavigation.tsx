@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User, Code, Crown, Gamepad2, ChevronDown, MoreHorizontal, Clock, Calculator, FileText, Settings, Zap, Puzzle } from "lucide-react";
+import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User, Code, MoreHorizontal } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -36,18 +35,10 @@ export default function AppNavigation() {
     { href: "/debug", label: "Debug", icon: Bug },
     { href: "/community", label: "Community", icon: Users },
     { href: "/chat", label: "Chat", icon: MessageCircle },
+    { href: "/others", label: "Others", icon: MoreHorizontal },
   ];
 
-  const otherNavItems = [
-    { href: "/chess", label: "Chess", icon: Crown, description: "Play chess with AI or friends" },
-    { href: "/games", label: "Games", icon: Gamepad2, description: "Code learning games" },
-    { href: "/timer", label: "Timer", icon: Clock, description: "Pomodoro timer for coding" },
-    { href: "/calculator", label: "Calculator", icon: Calculator, description: "Developer calculator" },
-    { href: "/notes", label: "Notes", icon: FileText, description: "Quick notes and snippets" },
-    { href: "/tools", label: "Tools", icon: Zap, description: "Developer utilities" },
-    { href: "/puzzles", label: "Puzzles", icon: Puzzle, description: "Code puzzles and challenges" },
-    { href: "/settings", label: "Settings", icon: Settings, description: "App preferences" },
-  ];
+
 
   return (
     <nav className="bg-slate-900/95 backdrop-blur-md border-b border-slate-700/50 sticky top-0 z-50 shadow-lg">
@@ -88,51 +79,7 @@ export default function AppNavigation() {
               );
             })}
 
-            {/* Others Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`flex items-center space-x-2 relative group transition-all duration-200 ${
-                    otherNavItems.some(item => location === item.href)
-                      ? "bg-blue-600/20 text-blue-300 border border-blue-500/30" 
-                      : "text-gray-300 hover:text-white hover:bg-slate-800/60"
-                  }`}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                  <span>Others</span>
-                  <ChevronDown className="h-3 w-3" />
-                  {otherNavItems.some(item => location === item.href) && (
-                    <div className="absolute -bottom-0.5 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-64 bg-slate-800/95 backdrop-blur-md border border-slate-700/50">
-                {otherNavItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = location === item.href;
-                  
-                  return (
-                    <Link key={item.href} href={item.href}>
-                      <DropdownMenuItem 
-                        className={`flex items-start space-x-3 p-3 cursor-pointer transition-all duration-200 ${
-                          isActive 
-                            ? "bg-blue-600/20 text-blue-300" 
-                            : "text-gray-300 hover:text-white hover:bg-slate-700/50"
-                        }`}
-                      >
-                        <Icon className={`h-4 w-4 mt-0.5 ${isActive ? 'text-blue-300' : 'text-gray-400'}`} />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-medium">{item.label}</div>
-                          <div className="text-xs text-gray-500 truncate">{item.description}</div>
-                        </div>
-                      </DropdownMenuItem>
-                    </Link>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+
 
             {/* User Menu */}
             {user && (
@@ -196,36 +143,7 @@ export default function AppNavigation() {
                 );
               })}
 
-              {/* Others Section */}
-              <div className="border-t border-slate-700 pt-4 mt-4">
-                <div className="flex items-center space-x-2 px-3 py-2 mb-2">
-                  <MoreHorizontal className="h-4 w-4 text-gray-400" />
-                  <span className="text-sm font-medium text-gray-400">Others</span>
-                </div>
-                {otherNavItems.map((item) => {
-                  const isActive = location === item.href;
-                  const Icon = item.icon;
 
-                  return (
-                    <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)}>
-                      <Button
-                        variant="ghost"
-                        className={`w-full justify-start space-x-3 py-3 ${
-                          isActive 
-                            ? "bg-blue-600/20 text-blue-300 border border-blue-500/30" 
-                            : "text-gray-300 hover:text-white hover:bg-slate-800/60"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5" />
-                        <div className="flex-1 text-left">
-                          <div className="text-sm font-medium">{item.label}</div>
-                          <div className="text-xs text-gray-500 truncate">{item.description}</div>
-                        </div>
-                      </Button>
-                    </Link>
-                  );
-                })}
-              </div>
 
               {/* Mobile User Menu */}
               {user && (
