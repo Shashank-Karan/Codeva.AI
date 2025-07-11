@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calculator as CalcIcon, Binary, Hash, Code2, Delete } from "lucide-react";
+import { Calculator as CalcIcon, Delete } from "lucide-react";
 import AppNavigation from "@/components/AppNavigation";
 
 export default function Calculator() {
@@ -13,6 +13,7 @@ export default function Calculator() {
   const [waitingForOperand, setWaitingForOperand] = useState(false);
   const [history, setHistory] = useState<string[]>([]);
 
+  // Basic Calculator Functions
   const inputDigit = (digit: string) => {
     if (waitingForOperand) {
       setDisplay(String(digit));
@@ -36,10 +37,6 @@ export default function Calculator() {
     setPreviousValue(null);
     setOperation(null);
     setWaitingForOperand(false);
-  };
-
-  const clearEntry = () => {
-    setDisplay('0');
   };
 
   const backspace = () => {
@@ -97,10 +94,15 @@ export default function Calculator() {
     }
   };
 
-  const convertNumber = (num: number, base: number) => {
+  // Number base conversion functions
+  const convertToBase = (num: number, base: number) => {
     if (isNaN(num) || !isFinite(num)) return '0';
     const intNum = Math.floor(Math.abs(num));
     return intNum.toString(base).toUpperCase();
+  };
+
+  const getCurrentNumber = () => {
+    return parseFloat(display) || 0;
   };
 
   return (
@@ -140,42 +142,48 @@ export default function Calculator() {
           </TabsList>
 
           <TabsContent value="basic">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-md mx-auto">
               <Card className="bg-white/10 border-white/20 backdrop-blur-sm rounded-2xl shadow-2xl">
-                <CardContent className="p-8">
+                <CardContent className="p-6">
                   {/* Display */}
-                  <div className="bg-black/30 rounded-xl p-6 mb-6">
+                  <div className="bg-black/30 rounded-xl p-4 mb-6">
                     <div className="text-right">
                       {operation && previousValue !== null && (
-                        <div className="text-gray-400 text-sm mb-2">
+                        <div className="text-gray-400 text-sm mb-1">
                           {previousValue} {getOperationSymbol(operation)}
                         </div>
                       )}
-                      <div className="text-white text-4xl font-mono font-bold min-h-[50px] flex items-center justify-end">
+                      <div className="text-white text-3xl font-mono font-bold min-h-[40px] flex items-center justify-end">
                         {display}
                       </div>
                     </div>
                   </div>
                   
                   {/* Button Grid */}
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-4 gap-3">
                     <Button 
                       onClick={clear} 
-                      className="h-14 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl col-span-2 text-lg"
+                      className="h-14 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl text-lg"
                     >
-                      Clear
+                      AC
                     </Button>
                     <Button 
                       onClick={backspace} 
                       className="h-14 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-lg"
                     >
-                      <Delete className="h-6 w-6" />
+                      <Delete className="h-5 w-5" />
                     </Button>
                     <Button 
                       onClick={() => performOperation('/')} 
                       className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
                     >
                       ÷
+                    </Button>
+                    <Button 
+                      onClick={() => performOperation('*')} 
+                      className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
+                    >
+                      ×
                     </Button>
                     
                     <Button 
@@ -197,10 +205,10 @@ export default function Calculator() {
                       9
                     </Button>
                     <Button 
-                      onClick={() => performOperation('*')} 
+                      onClick={() => performOperation('-')} 
                       className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
                     >
-                      ×
+                      -
                     </Button>
                     
                     <Button 
@@ -222,10 +230,10 @@ export default function Calculator() {
                       6
                     </Button>
                     <Button 
-                      onClick={() => performOperation('-')} 
+                      onClick={() => performOperation('+')} 
                       className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
                     >
-                      -
+                      +
                     </Button>
                     
                     <Button 
@@ -247,10 +255,10 @@ export default function Calculator() {
                       3
                     </Button>
                     <Button 
-                      onClick={() => performOperation('+')} 
-                      className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
+                      onClick={() => performOperation('=')} 
+                      className="h-14 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl text-xl row-span-2"
                     >
-                      +
+                      =
                     </Button>
                     
                     <Button 
@@ -265,18 +273,12 @@ export default function Calculator() {
                     >
                       .
                     </Button>
-                    <Button 
-                      onClick={() => performOperation('=')} 
-                      className="h-14 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl text-xl"
-                    >
-                      =
-                    </Button>
                   </div>
 
                   {/* History */}
                   {history.length > 0 && (
-                    <div className="mt-8 bg-black/20 rounded-xl p-4">
-                      <h3 className="text-white font-semibold mb-3">Recent Calculations</h3>
+                    <div className="mt-6 bg-black/20 rounded-xl p-4">
+                      <h3 className="text-white font-semibold mb-3">History</h3>
                       <div className="space-y-2 max-h-32 overflow-y-auto">
                         {history.slice(0, 5).map((calc, index) => (
                           <div key={index} className="text-gray-300 font-mono text-sm">
@@ -288,6 +290,7 @@ export default function Calculator() {
                         onClick={() => setHistory([])} 
                         className="mt-3 bg-red-500/20 hover:bg-red-500/30 text-red-300 border-red-500/50"
                         variant="outline"
+                        size="sm"
                       >
                         Clear History
                       </Button>
@@ -312,21 +315,21 @@ export default function Calculator() {
                     
                     <div className="space-y-3">
                       <div className="bg-black/20 rounded-lg p-3">
-                        <label className="text-green-400 text-sm font-medium">Binary</label>
+                        <label className="text-green-400 text-sm font-medium block mb-1">Binary</label>
                         <div className="text-white font-mono text-lg">
-                          {convertNumber(parseFloat(display) || 0, 2)}
+                          {convertToBase(getCurrentNumber(), 2)}
                         </div>
                       </div>
                       <div className="bg-black/20 rounded-lg p-3">
-                        <label className="text-blue-400 text-sm font-medium">Hexadecimal</label>
+                        <label className="text-blue-400 text-sm font-medium block mb-1">Hexadecimal</label>
                         <div className="text-white font-mono text-lg">
-                          {convertNumber(parseFloat(display) || 0, 16)}
+                          {convertToBase(getCurrentNumber(), 16)}
                         </div>
                       </div>
                       <div className="bg-black/20 rounded-lg p-3">
-                        <label className="text-purple-400 text-sm font-medium">Octal</label>
+                        <label className="text-purple-400 text-sm font-medium block mb-1">Octal</label>
                         <div className="text-white font-mono text-lg">
-                          {convertNumber(parseFloat(display) || 0, 8)}
+                          {convertToBase(getCurrentNumber(), 8)}
                         </div>
                       </div>
                     </div>
@@ -348,16 +351,40 @@ export default function Calculator() {
                     
                     <h3 className="text-white text-xl font-semibold mt-6">Operations</h3>
                     <div className="grid grid-cols-2 gap-3">
-                      <Button className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
+                      <Button 
+                        onClick={() => {
+                          const num = getCurrentNumber();
+                          setDisplay(String(num & 0xFFFF));
+                        }}
+                        className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl"
+                      >
                         AND
                       </Button>
-                      <Button className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
+                      <Button 
+                        onClick={() => {
+                          const num = getCurrentNumber();
+                          setDisplay(String(num | 0xFFFF));
+                        }}
+                        className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl"
+                      >
                         OR
                       </Button>
-                      <Button className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
+                      <Button 
+                        onClick={() => {
+                          const num = getCurrentNumber();
+                          setDisplay(String(num ^ 0xFFFF));
+                        }}
+                        className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl"
+                      >
                         XOR
                       </Button>
-                      <Button className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
+                      <Button 
+                        onClick={() => {
+                          const num = getCurrentNumber();
+                          setDisplay(String(~num & 0xFFFF));
+                        }}
+                        className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl"
+                      >
                         NOT
                       </Button>
                     </div>
@@ -376,28 +403,29 @@ export default function Calculator() {
                     <div>
                       <label className="text-gray-300 text-sm font-medium block mb-2">Decimal</label>
                       <Input
+                        type="number"
                         value={display}
-                        onChange={(e) => setDisplay(e.target.value)}
-                        className="bg-black/30 border-white/20 text-white font-mono text-lg rounded-xl"
+                        onChange={(e) => setDisplay(e.target.value || '0')}
+                        className="bg-black/30 border-white/20 text-white font-mono text-lg rounded-xl h-12"
                         placeholder="Enter decimal number"
                       />
                     </div>
                     <div>
                       <label className="text-green-400 text-sm font-medium block mb-2">Binary</label>
-                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
-                        {convertNumber(parseFloat(display) || 0, 2)}
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono h-12 flex items-center">
+                        {convertToBase(getCurrentNumber(), 2)}
                       </div>
                     </div>
                     <div>
                       <label className="text-blue-400 text-sm font-medium block mb-2">Hexadecimal</label>
-                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
-                        {convertNumber(parseFloat(display) || 0, 16)}
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono h-12 flex items-center">
+                        {convertToBase(getCurrentNumber(), 16)}
                       </div>
                     </div>
                     <div>
                       <label className="text-purple-400 text-sm font-medium block mb-2">Octal</label>
-                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
-                        {convertNumber(parseFloat(display) || 0, 8)}
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono h-12 flex items-center">
+                        {convertToBase(getCurrentNumber(), 8)}
                       </div>
                     </div>
                   </div>
@@ -411,28 +439,29 @@ export default function Calculator() {
                     <div>
                       <label className="text-gray-300 text-sm font-medium block mb-2">Bytes</label>
                       <Input
+                        type="number"
                         value={display}
-                        onChange={(e) => setDisplay(e.target.value)}
-                        className="bg-black/30 border-white/20 text-white font-mono text-lg rounded-xl"
+                        onChange={(e) => setDisplay(e.target.value || '0')}
+                        className="bg-black/30 border-white/20 text-white font-mono text-lg rounded-xl h-12"
                         placeholder="Enter bytes"
                       />
                     </div>
                     <div>
                       <label className="text-cyan-400 text-sm font-medium block mb-2">Kilobytes</label>
-                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
-                        {((parseFloat(display) || 0) / 1024).toFixed(2)} KB
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono h-12 flex items-center">
+                        {(getCurrentNumber() / 1024).toFixed(2)} KB
                       </div>
                     </div>
                     <div>
                       <label className="text-yellow-400 text-sm font-medium block mb-2">Megabytes</label>
-                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
-                        {((parseFloat(display) || 0) / (1024 * 1024)).toFixed(2)} MB
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono h-12 flex items-center">
+                        {(getCurrentNumber() / (1024 * 1024)).toFixed(2)} MB
                       </div>
                     </div>
                     <div>
                       <label className="text-pink-400 text-sm font-medium block mb-2">Gigabytes</label>
-                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
-                        {((parseFloat(display) || 0) / (1024 * 1024 * 1024)).toFixed(6)} GB
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono h-12 flex items-center">
+                        {(getCurrentNumber() / (1024 * 1024 * 1024)).toFixed(6)} GB
                       </div>
                     </div>
                   </div>
