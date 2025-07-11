@@ -59,7 +59,7 @@ export default function Calculator() {
       const currentValue = previousValue || 0;
       const result = calculate(currentValue, inputValue, operation);
       
-      const calculation = `${currentValue} ${operation} ${inputValue} = ${result}`;
+      const calculation = `${currentValue} ${getOperationSymbol(operation)} ${inputValue} = ${result}`;
       setHistory(prev => [calculation, ...prev.slice(0, 9)]);
       
       setPreviousValue(result);
@@ -68,6 +68,16 @@ export default function Calculator() {
 
     setWaitingForOperand(true);
     setOperation(nextOperation);
+  };
+
+  const getOperationSymbol = (op: string) => {
+    switch (op) {
+      case '+': return '+';
+      case '-': return '-';
+      case '*': return '×';
+      case '/': return '÷';
+      default: return op;
+    }
   };
 
   const calculate = (firstValue: number, secondValue: number, operation: string) => {
@@ -93,240 +103,263 @@ export default function Calculator() {
     return intNum.toString(base).toUpperCase();
   };
 
-  const convertFromBase = (value: string, fromBase: number) => {
-    const num = parseInt(value, fromBase);
-    return isNaN(num) ? 0 : num;
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <AppNavigation />
       
-      <div className="max-w-7xl mx-auto px-4 py-4 sm:py-8">
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Developer Calculator
+      <div className="container mx-auto px-4 py-6">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">
+            Calculator
           </h1>
-          <p className="text-gray-300 text-base sm:text-lg">
-            Mathematical and programming calculations
+          <p className="text-gray-300">
+            Simple and powerful calculator for all your needs
           </p>
         </div>
 
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-slate-800/40 mb-6">
-            <TabsTrigger value="basic" className="text-white data-[state=active]:bg-blue-600">Basic</TabsTrigger>
-            <TabsTrigger value="programmer" className="text-white data-[state=active]:bg-blue-600">Programmer</TabsTrigger>
-            <TabsTrigger value="converter" className="text-white data-[state=active]:bg-blue-600">Converter</TabsTrigger>
+        <Tabs defaultValue="basic" className="w-full max-w-6xl mx-auto">
+          <TabsList className="grid w-full grid-cols-3 bg-white/10 mb-8 rounded-xl">
+            <TabsTrigger 
+              value="basic" 
+              className="text-white data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-lg"
+            >
+              Basic
+            </TabsTrigger>
+            <TabsTrigger 
+              value="programmer" 
+              className="text-white data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-lg"
+            >
+              Programmer
+            </TabsTrigger>
+            <TabsTrigger 
+              value="converter" 
+              className="text-white data-[state=active]:bg-blue-500 data-[state=active]:text-white rounded-lg"
+            >
+              Converter
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basic" className="space-y-4">
-            <div className="grid gap-6 lg:grid-cols-2">
-              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white text-xl flex items-center gap-2">
-                    <CalcIcon className="h-5 w-5" />
-                    Basic Calculator
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="bg-slate-900/50 p-4 rounded-lg border border-slate-600">
-                      <div className="text-right text-3xl font-mono text-white mb-2 min-h-[40px] flex items-center justify-end">
-                        {display}
-                      </div>
+          <TabsContent value="basic">
+            <div className="max-w-4xl mx-auto">
+              <Card className="bg-white/10 border-white/20 backdrop-blur-sm rounded-2xl shadow-2xl">
+                <CardContent className="p-8">
+                  {/* Display */}
+                  <div className="bg-black/30 rounded-xl p-6 mb-6">
+                    <div className="text-right">
                       {operation && previousValue !== null && (
-                        <div className="text-right text-sm text-gray-400">
-                          {previousValue} {operation}
+                        <div className="text-gray-400 text-sm mb-2">
+                          {previousValue} {getOperationSymbol(operation)}
                         </div>
                       )}
-                    </div>
-                    
-                    <div className="grid grid-cols-4 gap-3">
-                      <Button onClick={clear} variant="outline" className="h-12 border-red-600 text-red-400 hover:bg-red-600/20">
-                        AC
-                      </Button>
-                      <Button onClick={clearEntry} variant="outline" className="h-12 border-orange-600 text-orange-400 hover:bg-orange-600/20">
-                        CE
-                      </Button>
-                      <Button onClick={backspace} variant="outline" className="h-12 border-slate-600 text-gray-300 hover:bg-slate-600/20">
-                        <Delete className="h-4 w-4" />
-                      </Button>
-                      <Button onClick={() => performOperation('/')} variant="outline" className="h-12 border-blue-600 text-blue-400 hover:bg-blue-600/20">
-                        ÷
-                      </Button>
-                      
-                      <Button onClick={() => inputDigit('7')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        7
-                      </Button>
-                      <Button onClick={() => inputDigit('8')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        8
-                      </Button>
-                      <Button onClick={() => inputDigit('9')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        9
-                      </Button>
-                      <Button onClick={() => performOperation('*')} variant="outline" className="h-12 border-blue-600 text-blue-400 hover:bg-blue-600/20">
-                        ×
-                      </Button>
-                      
-                      <Button onClick={() => inputDigit('4')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        4
-                      </Button>
-                      <Button onClick={() => inputDigit('5')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        5
-                      </Button>
-                      <Button onClick={() => inputDigit('6')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        6
-                      </Button>
-                      <Button onClick={() => performOperation('-')} variant="outline" className="h-12 border-blue-600 text-blue-400 hover:bg-blue-600/20">
-                        -
-                      </Button>
-                      
-                      <Button onClick={() => inputDigit('1')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        1
-                      </Button>
-                      <Button onClick={() => inputDigit('2')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        2
-                      </Button>
-                      <Button onClick={() => inputDigit('3')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        3
-                      </Button>
-                      <Button onClick={() => performOperation('+')} variant="outline" className="h-12 border-blue-600 text-blue-400 hover:bg-blue-600/20">
-                        +
-                      </Button>
-                      
-                      <Button onClick={() => inputDigit('0')} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold col-span-2">
-                        0
-                      </Button>
-                      <Button onClick={inputDot} className="h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold">
-                        .
-                      </Button>
-                      <Button onClick={() => performOperation('=')} className="h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold">
-                        =
-                      </Button>
+                      <div className="text-white text-4xl font-mono font-bold min-h-[50px] flex items-center justify-end">
+                        {display}
+                      </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* History Panel */}
-              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white text-lg">Calculation History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="max-h-96 overflow-y-auto space-y-2">
-                    {history.length === 0 ? (
-                      <p className="text-gray-400 text-center py-8">No calculations yet</p>
-                    ) : (
-                      history.map((calc, index) => (
-                        <div key={index} className="p-3 bg-slate-900/50 rounded-lg border border-slate-600/50">
-                          <p className="text-white font-mono text-sm">{calc}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                  {history.length > 0 && (
+                  
+                  {/* Button Grid */}
+                  <div className="grid grid-cols-4 gap-4">
                     <Button 
-                      onClick={() => setHistory([])} 
-                      variant="outline" 
-                      className="w-full mt-4 border-slate-600 text-gray-300 hover:bg-slate-600/20"
+                      onClick={clear} 
+                      className="h-14 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl col-span-2 text-lg"
                     >
-                      Clear History
+                      Clear
                     </Button>
+                    <Button 
+                      onClick={backspace} 
+                      className="h-14 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-lg"
+                    >
+                      <Delete className="h-6 w-6" />
+                    </Button>
+                    <Button 
+                      onClick={() => performOperation('/')} 
+                      className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
+                    >
+                      ÷
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => inputDigit('7')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      7
+                    </Button>
+                    <Button 
+                      onClick={() => inputDigit('8')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      8
+                    </Button>
+                    <Button 
+                      onClick={() => inputDigit('9')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      9
+                    </Button>
+                    <Button 
+                      onClick={() => performOperation('*')} 
+                      className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
+                    >
+                      ×
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => inputDigit('4')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      4
+                    </Button>
+                    <Button 
+                      onClick={() => inputDigit('5')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      5
+                    </Button>
+                    <Button 
+                      onClick={() => inputDigit('6')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      6
+                    </Button>
+                    <Button 
+                      onClick={() => performOperation('-')} 
+                      className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
+                    >
+                      -
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => inputDigit('1')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      1
+                    </Button>
+                    <Button 
+                      onClick={() => inputDigit('2')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      2
+                    </Button>
+                    <Button 
+                      onClick={() => inputDigit('3')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      3
+                    </Button>
+                    <Button 
+                      onClick={() => performOperation('+')} 
+                      className="h-14 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl text-xl"
+                    >
+                      +
+                    </Button>
+                    
+                    <Button 
+                      onClick={() => inputDigit('0')} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl col-span-2"
+                    >
+                      0
+                    </Button>
+                    <Button 
+                      onClick={inputDot} 
+                      className="h-14 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl text-xl"
+                    >
+                      .
+                    </Button>
+                    <Button 
+                      onClick={() => performOperation('=')} 
+                      className="h-14 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl text-xl"
+                    >
+                      =
+                    </Button>
+                  </div>
+
+                  {/* History */}
+                  {history.length > 0 && (
+                    <div className="mt-8 bg-black/20 rounded-xl p-4">
+                      <h3 className="text-white font-semibold mb-3">Recent Calculations</h3>
+                      <div className="space-y-2 max-h-32 overflow-y-auto">
+                        {history.slice(0, 5).map((calc, index) => (
+                          <div key={index} className="text-gray-300 font-mono text-sm">
+                            {calc}
+                          </div>
+                        ))}
+                      </div>
+                      <Button 
+                        onClick={() => setHistory([])} 
+                        className="mt-3 bg-red-500/20 hover:bg-red-500/30 text-red-300 border-red-500/50"
+                        variant="outline"
+                      >
+                        Clear History
+                      </Button>
+                    </div>
                   )}
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
 
-          <TabsContent value="programmer" className="space-y-4">
-            <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white text-xl flex items-center gap-2">
-                  <Binary className="h-5 w-5" />
-                  Programmer Calculator
-                </CardTitle>
-                <CardDescription className="text-gray-300">
-                  Binary, hexadecimal, and bitwise operations
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
+          <TabsContent value="programmer">
+            <Card className="bg-white/10 border-white/20 backdrop-blur-sm rounded-2xl shadow-2xl">
+              <CardContent className="p-6">
+                <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-4">
-                    <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Current Value</label>
-                      <Input
-                        value={display}
-                        readOnly
-                        className="bg-slate-900/50 border-slate-600 text-white font-mono text-lg"
-                      />
+                    <h3 className="text-white text-xl font-semibold">Current Value</h3>
+                    <div className="bg-black/30 rounded-xl p-4">
+                      <div className="text-white text-2xl font-mono text-center">
+                        {display}
+                      </div>
                     </div>
+                    
                     <div className="space-y-3">
-                      <div>
-                        <label className="text-sm text-gray-300 mb-2 block">Binary</label>
-                        <Input
-                          value={convertNumber(parseFloat(display) || 0, 2)}
-                          readOnly
-                          className="bg-slate-900/50 border-slate-600 text-green-400 font-mono"
-                        />
+                      <div className="bg-black/20 rounded-lg p-3">
+                        <label className="text-green-400 text-sm font-medium">Binary</label>
+                        <div className="text-white font-mono text-lg">
+                          {convertNumber(parseFloat(display) || 0, 2)}
+                        </div>
                       </div>
-                      <div>
-                        <label className="text-sm text-gray-300 mb-2 block">Hexadecimal</label>
-                        <Input
-                          value={convertNumber(parseFloat(display) || 0, 16)}
-                          readOnly
-                          className="bg-slate-900/50 border-slate-600 text-blue-400 font-mono"
-                        />
+                      <div className="bg-black/20 rounded-lg p-3">
+                        <label className="text-blue-400 text-sm font-medium">Hexadecimal</label>
+                        <div className="text-white font-mono text-lg">
+                          {convertNumber(parseFloat(display) || 0, 16)}
+                        </div>
                       </div>
-                      <div>
-                        <label className="text-sm text-gray-300 mb-2 block">Octal</label>
-                        <Input
-                          value={convertNumber(parseFloat(display) || 0, 8)}
-                          readOnly
-                          className="bg-slate-900/50 border-slate-600 text-purple-400 font-mono"
-                        />
+                      <div className="bg-black/20 rounded-lg p-3">
+                        <label className="text-purple-400 text-sm font-medium">Octal</label>
+                        <div className="text-white font-mono text-lg">
+                          {convertNumber(parseFloat(display) || 0, 8)}
+                        </div>
                       </div>
                     </div>
                   </div>
                   
                   <div className="space-y-4">
-                    <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Bitwise Operations</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button variant="outline" className="border-slate-600 text-gray-300 hover:bg-slate-600/20">
-                          AND
+                    <h3 className="text-white text-xl font-semibold">Hex Input</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                      {['A', 'B', 'C', 'D', 'E', 'F'].map(hex => (
+                        <Button
+                          key={hex}
+                          onClick={() => inputDigit(hex)}
+                          className="h-12 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-xl"
+                        >
+                          {hex}
                         </Button>
-                        <Button variant="outline" className="border-slate-600 text-gray-300 hover:bg-slate-600/20">
-                          OR
-                        </Button>
-                        <Button variant="outline" className="border-slate-600 text-gray-300 hover:bg-slate-600/20">
-                          XOR
-                        </Button>
-                        <Button variant="outline" className="border-slate-600 text-gray-300 hover:bg-slate-600/20">
-                          NOT
-                        </Button>
-                        <Button variant="outline" className="border-slate-600 text-gray-300 hover:bg-slate-600/20">
-                          LSH
-                        </Button>
-                        <Button variant="outline" className="border-slate-600 text-gray-300 hover:bg-slate-600/20">
-                          RSH
-                        </Button>
-                      </div>
+                      ))}
                     </div>
                     
-                    <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Hex Input</label>
-                      <div className="grid grid-cols-4 gap-2">
-                        {['A', 'B', 'C', 'D', 'E', 'F'].map(hex => (
-                          <Button
-                            key={hex}
-                            onClick={() => inputDigit(hex)}
-                            className="h-10 bg-slate-700 hover:bg-slate-600 text-white font-semibold"
-                          >
-                            {hex}
-                          </Button>
-                        ))}
-                      </div>
+                    <h3 className="text-white text-xl font-semibold mt-6">Operations</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
+                        AND
+                      </Button>
+                      <Button className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
+                        OR
+                      </Button>
+                      <Button className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
+                        XOR
+                      </Button>
+                      <Button className="h-12 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl">
+                        NOT
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -334,93 +367,73 @@ export default function Calculator() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="converter" className="space-y-4">
+          <TabsContent value="converter">
             <div className="grid gap-6 md:grid-cols-2">
-              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white text-lg flex items-center gap-2">
-                    <Hash className="h-5 w-5" />
-                    Number Base Converter
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+              <Card className="bg-white/10 border-white/20 backdrop-blur-sm rounded-2xl shadow-2xl">
+                <CardContent className="p-6">
+                  <h3 className="text-white text-xl font-semibold mb-4">Number Base Converter</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Decimal</label>
+                      <label className="text-gray-300 text-sm font-medium block mb-2">Decimal</label>
                       <Input
                         value={display}
                         onChange={(e) => setDisplay(e.target.value)}
-                        className="bg-slate-900/50 border-slate-600 text-white font-mono"
+                        className="bg-black/30 border-white/20 text-white font-mono text-lg rounded-xl"
+                        placeholder="Enter decimal number"
                       />
                     </div>
                     <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Binary</label>
-                      <Input
-                        value={convertNumber(parseFloat(display) || 0, 2)}
-                        readOnly
-                        className="bg-slate-900/50 border-slate-600 text-green-400 font-mono"
-                      />
+                      <label className="text-green-400 text-sm font-medium block mb-2">Binary</label>
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
+                        {convertNumber(parseFloat(display) || 0, 2)}
+                      </div>
                     </div>
                     <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Hexadecimal</label>
-                      <Input
-                        value={convertNumber(parseFloat(display) || 0, 16)}
-                        readOnly
-                        className="bg-slate-900/50 border-slate-600 text-blue-400 font-mono"
-                      />
+                      <label className="text-blue-400 text-sm font-medium block mb-2">Hexadecimal</label>
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
+                        {convertNumber(parseFloat(display) || 0, 16)}
+                      </div>
                     </div>
                     <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Octal</label>
-                      <Input
-                        value={convertNumber(parseFloat(display) || 0, 8)}
-                        readOnly
-                        className="bg-slate-900/50 border-slate-600 text-purple-400 font-mono"
-                      />
+                      <label className="text-purple-400 text-sm font-medium block mb-2">Octal</label>
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
+                        {convertNumber(parseFloat(display) || 0, 8)}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               
-              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white text-lg flex items-center gap-2">
-                    <Code2 className="h-5 w-5" />
-                    Developer Units
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
+              <Card className="bg-white/10 border-white/20 backdrop-blur-sm rounded-2xl shadow-2xl">
+                <CardContent className="p-6">
+                  <h3 className="text-white text-xl font-semibold mb-4">Unit Converter</h3>
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Bytes</label>
+                      <label className="text-gray-300 text-sm font-medium block mb-2">Bytes</label>
                       <Input
                         value={display}
                         onChange={(e) => setDisplay(e.target.value)}
-                        className="bg-slate-900/50 border-slate-600 text-white font-mono"
+                        className="bg-black/30 border-white/20 text-white font-mono text-lg rounded-xl"
+                        placeholder="Enter bytes"
                       />
                     </div>
                     <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Kilobytes</label>
-                      <Input
-                        value={((parseFloat(display) || 0) / 1024).toFixed(2)}
-                        readOnly
-                        className="bg-slate-900/50 border-slate-600 text-cyan-400 font-mono"
-                      />
+                      <label className="text-cyan-400 text-sm font-medium block mb-2">Kilobytes</label>
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
+                        {((parseFloat(display) || 0) / 1024).toFixed(2)} KB
+                      </div>
                     </div>
                     <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Megabytes</label>
-                      <Input
-                        value={((parseFloat(display) || 0) / (1024 * 1024)).toFixed(2)}
-                        readOnly
-                        className="bg-slate-900/50 border-slate-600 text-yellow-400 font-mono"
-                      />
+                      <label className="text-yellow-400 text-sm font-medium block mb-2">Megabytes</label>
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
+                        {((parseFloat(display) || 0) / (1024 * 1024)).toFixed(2)} MB
+                      </div>
                     </div>
                     <div>
-                      <label className="text-sm text-gray-300 mb-2 block">Gigabytes</label>
-                      <Input
-                        value={((parseFloat(display) || 0) / (1024 * 1024 * 1024)).toFixed(2)}
-                        readOnly
-                        className="bg-slate-900/50 border-slate-600 text-pink-400 font-mono"
-                      />
+                      <label className="text-pink-400 text-sm font-medium block mb-2">Gigabytes</label>
+                      <div className="bg-black/30 border border-white/20 rounded-xl p-3 text-white font-mono">
+                        {((parseFloat(display) || 0) / (1024 * 1024 * 1024)).toFixed(6)} GB
+                      </div>
                     </div>
                   </div>
                 </CardContent>
