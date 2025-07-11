@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import AppNavigation from "@/components/AppNavigation";
-import { Crown, Gamepad2, Clock, Calculator, FileText, Settings, Zap, Puzzle } from "lucide-react";
+import { Crown, Clock, Calculator, FileText, Zap, Puzzle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const otherFeatures = [
@@ -10,13 +10,6 @@ const otherFeatures = [
     icon: Crown, 
     description: "Play chess with AI or friends",
     color: "from-amber-500 to-orange-500"
-  },
-  { 
-    href: "/games", 
-    label: "Games", 
-    icon: Gamepad2, 
-    description: "Code learning games",
-    color: "from-green-500 to-emerald-500"
   },
   { 
     href: "/timer", 
@@ -52,13 +45,6 @@ const otherFeatures = [
     icon: Puzzle, 
     description: "Code puzzles and challenges",
     color: "from-indigo-500 to-purple-500"
-  },
-  { 
-    href: "/settings", 
-    label: "Settings", 
-    icon: Settings, 
-    description: "App preferences",
-    color: "from-gray-500 to-slate-500"
   },
 ];
 
