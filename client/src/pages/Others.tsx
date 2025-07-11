@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import AppNavigation from "@/components/AppNavigation";
-import { Crown, Clock, Calculator, FileText, Zap, Puzzle } from "lucide-react";
+import { Crown, Calculator, FileText, Zap, Puzzle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const otherFeatures = [
@@ -10,13 +10,6 @@ const otherFeatures = [
     icon: Crown, 
     description: "Play chess with AI or friends",
     color: "from-amber-500 to-orange-500"
-  },
-  { 
-    href: "/timer", 
-    label: "Timer", 
-    icon: Clock, 
-    description: "Pomodoro timer for coding",
-    color: "from-blue-500 to-cyan-500"
   },
   { 
     href: "/calculator", 
