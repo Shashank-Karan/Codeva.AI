@@ -131,6 +131,8 @@ Codeva.AI is a full-stack web application designed for code analysis, visualizat
 - **SESSION_SECRET**: Session encryption secret
 
 ## Changelog
+- July 13, 2025. Upgraded AI Chat Assistant with simplified, user-friendly interface including smart chat modes (General, Code, Learning, Creative), streamlined file upload, clean message layout, and improved user experience
+- July 13, 2025. Added comprehensive chat persistence with database storage for conversations and messages, enhanced backend routes for chat management
 - July 10, 2025. Redesigned footer with anime-style aesthetics including animated background elements, floating particles, colorful hover effects, gradient text, and comprehensive project navigation organized by Features, Tools, and Connect sections
 - July 10, 2025. Made Home page exactly identical to Landing page with same design, layout, animations, feature cards, detailed sections, and visual consistency for authenticated users
 - July 09, 2025. Added comprehensive Code Learning Games section with 5 interactive mini-games: Fix the Bug, Predict the Output, Drag-and-Drop Order, Fill in the Blank, and Spot the Error
