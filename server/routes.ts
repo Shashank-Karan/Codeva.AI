@@ -4,8 +4,8 @@ import { Server as SocketIOServer } from "socket.io";
 import { Chess } from "chess.js";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
-import { analyzeCode, debugCode } from "./services/gemini";
-import { insertPostSchema, insertCodeAnalysisSchema, insertDebugSchema, insertChessGameSchema, insertChessMessageSchema } from "@shared/schema";
+import { analyzeCode, debugCode, chatWithAI } from "./services/gemini";
+import { insertPostSchema, insertCodeAnalysisSchema, insertDebugSchema, insertChessGameSchema, insertChessMessageSchema, insertChatConversationSchema, insertChatMessageSchema } from "@shared/schema";
 
 // Simple auth middleware
 function isAuthenticated(req: any, res: any, next: any) {
@@ -62,22 +62,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Chat route for file/text analysis
+  // Enhanced AI Chat routes with conversation management
   app.post('/api/chat', async (req: any, res) => {
     try {
-      const { message, fileContent, fileType } = req.body;
+      const { message, fileContent, fileType, conversationId, mode = 'general' } = req.body;
       
       if (!message) {
         return res.status(400).json({ message: "Message is required" });
       }
 
-      const { chatWithAI } = await import('./services/gemini');
+      const userId = req.user?.id?.toString();
+      let currentConversationId = conversationId;
+
+      // Create new conversation if none provided
+      if (!currentConversationId && userId) {
+        const conversation = await storage.createChatConversation(userId, {
+          title: message.slice(0, 50) + (message.length > 50 ? '...' : ''),
+          mode,
+        });
+        currentConversationId = conversation.id;
+      }
+
+      // Add user message to conversation
+      if (currentConversationId) {
+        await storage.addChatMessage(currentConversationId, {
+          type: 'user',
+          content: message,
+          fileInfo: fileContent ? { 
+            name: 'uploaded-file', 
+            type: fileType || 'text/plain', 
+            size: fileContent.length 
+          } : undefined,
+        });
+      }
+
+      // Get AI response
       const response = await chatWithAI(message, fileContent, fileType);
+
+      // Add AI response to conversation
+      if (currentConversationId) {
+        await storage.addChatMessage(currentConversationId, {
+          type: 'ai',
+          content: response,
+        });
+      }
       
-      res.json({ response });
+      res.json({ 
+        response, 
+        conversationId: currentConversationId 
+      });
     } catch (error) {
       console.error("Error in AI chat:", error);
       res.status(500).json({ message: "Failed to get AI response" });
+    }
+  });
+
+  // Get chat conversations
+  app.get('/api/chat/conversations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id.toString();
+      const conversations = await storage.getUserChatConversations(userId);
+      res.json(conversations);
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+      res.status(500).json({ message: "Failed to fetch conversations" });
+    }
+  });
+
+  // Get specific conversation with messages
+  app.get('/api/chat/conversations/:id', async (req: any, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const conversation = await storage.getChatConversation(conversationId);
+      
+      if (!conversation) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      // Check if user owns the conversation (optional authentication)
+      if (req.user && conversation.userId && conversation.userId !== req.user.id) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      res.json(conversation);
+    } catch (error) {
+      console.error("Error fetching conversation:", error);
+      res.status(500).json({ message: "Failed to fetch conversation" });
+    }
+  });
+
+  // Update conversation (e.g., rename)
+  app.patch('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const updates = req.body;
+      const userId = req.user.id;
+
+      // Verify ownership
+      const conversation = await storage.getChatConversation(conversationId);
+      if (!conversation || conversation.userId !== userId) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      const updatedConversation = await storage.updateChatConversation(conversationId, updates);
+      res.json(updatedConversation);
+    } catch (error) {
+      console.error("Error updating conversation:", error);
+      res.status(500).json({ message: "Failed to update conversation" });
+    }
+  });
+
+  // Delete conversation
+  app.delete('/api/chat/conversations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const conversationId = parseInt(req.params.id);
+      const userId = req.user.id;
+
+      // Verify ownership
+      const conversation = await storage.getChatConversation(conversationId);
+      if (!conversation || conversation.userId !== userId) {
+        return res.status(404).json({ message: "Conversation not found" });
+      }
+
+      await storage.deleteChatConversation(conversationId);
+      res.json({ message: "Conversation deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      res.status(500).json({ message: "Failed to delete conversation" });
     }
   });
 

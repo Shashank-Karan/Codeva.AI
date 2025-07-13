@@ -114,6 +114,26 @@ export const chessGameMessages = pgTable("chess_game_messages", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Chat conversations table
+export const chatConversations = pgTable("chat_conversations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  mode: text("mode").default("general").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Chat messages table
+export const chatMessages = pgTable("chat_messages", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").notNull().references(() => chatConversations.id, { onDelete: "cascade" }),
+  type: text("type", { enum: ["user", "ai"] }).notNull(),
+  content: text("content").notNull(),
+  fileInfo: jsonb("file_info").$type<{ name: string; type: string; size: number }>(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
@@ -123,6 +143,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   whiteChessGames: many(chessGames, { relationName: "whitePlayer" }),
   blackChessGames: many(chessGames, { relationName: "blackPlayer" }),
   chessGameMessages: many(chessGameMessages),
+  chatConversations: many(chatConversations),
 }));
 
 export const postsRelations = relations(posts, ({ one, many }) => ({
@@ -166,6 +187,21 @@ export const chessGameMessagesRelations = relations(chessGameMessages, ({ one })
   user: one(users, {
     fields: [chessGameMessages.userId],
     references: [users.id],
+  }),
+}));
+
+export const chatConversationsRelations = relations(chatConversations, ({ one, many }) => ({
+  user: one(users, {
+    fields: [chatConversations.userId],
+    references: [users.id],
+  }),
+  messages: many(chatMessages),
+}));
+
+export const chatMessagesRelations = relations(chatMessages, ({ one }) => ({
+  conversation: one(chatConversations, {
+    fields: [chatMessages.conversationId],
+    references: [chatConversations.id],
   }),
 }));
 
@@ -216,6 +252,17 @@ export const insertChessMessageSchema = createInsertSchema(chessGameMessages).pi
   messageType: true,
 });
 
+export const insertChatConversationSchema = createInsertSchema(chatConversations).pick({
+  title: true,
+  mode: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).pick({
+  type: true,
+  content: true,
+  fileInfo: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -237,3 +284,8 @@ export type InsertChessGame = z.infer<typeof insertChessGameSchema>;
 export type ChessGameMessage = typeof chessGameMessages.$inferSelect;
 export type ChessGameMessageWithUser = ChessGameMessage & { user: User | null };
 export type InsertChessMessage = z.infer<typeof insertChessMessageSchema>;
+export type ChatConversation = typeof chatConversations.$inferSelect;
+export type ChatConversationWithMessages = ChatConversation & { messages: ChatMessage[] };
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatConversation = z.infer<typeof insertChatConversationSchema>;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
