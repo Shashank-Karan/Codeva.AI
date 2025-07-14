@@ -42,9 +42,12 @@ export default function AuditLogs() {
     queryKey: ["/api/admin/logs", filters, page],
   });
 
-  const { data: admins } = useQuery({
-    queryKey: ["/api/admin/users", { role: "admin" }],
+  const { data: usersData } = useQuery({
+    queryKey: ["/api/admin/users"],
   });
+
+  // Filter admin users from the response
+  const admins = usersData?.users?.filter((user: any) => user.role === 'admin') || [];
 
   const getActionIcon = (action: string) => {
     switch (action.toLowerCase()) {
