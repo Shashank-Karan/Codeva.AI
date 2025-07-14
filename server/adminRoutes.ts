@@ -107,6 +107,68 @@ export function registerAdminRoutes(app: Express) {
     }
   });
 
+  // System Alerts
+  app.get("/api/admin/dashboard/alerts", isAdmin, async (req: any, res) => {
+    try {
+      const alerts = [];
+      
+      // Check for failed login attempts in the last hour
+      const oneHourAgo = new Date();
+      oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+      
+      const failedLogins = await db
+        .select({ count: count() })
+        .from(loginAttempts)
+        .where(and(
+          eq(loginAttempts.success, false),
+          gte(loginAttempts.attemptedAt, oneHourAgo)
+        ));
+
+      if (failedLogins[0]?.count > 5) {
+        alerts.push({
+          type: "error",
+          priority: "High Priority",
+          message: `${failedLogins[0].count} failed login attempts detected`,
+          timestamp: new Date(),
+          color: "red"
+        });
+      }
+
+      // Check for new user registrations spike
+      const last24Hours = new Date();
+      last24Hours.setHours(last24Hours.getHours() - 24);
+      
+      const newUsers = await db
+        .select({ count: count() })
+        .from(users)
+        .where(gte(users.createdAt, last24Hours));
+
+      if (newUsers[0]?.count > 10) {
+        alerts.push({
+          type: "info",
+          priority: "Info",
+          message: "New user registration spike detected",
+          timestamp: new Date(),
+          color: "blue"
+        });
+      }
+
+      // Check system health (placeholder)
+      alerts.push({
+        type: "warning",
+        priority: "Medium Priority", 
+        message: "System performing optimally",
+        timestamp: new Date(),
+        color: "yellow"
+      });
+
+      res.json(alerts);
+    } catch (error) {
+      console.error("Error fetching system alerts:", error);
+      res.status(500).json({ message: "Failed to fetch system alerts" });
+    }
+  });
+
   // User Management
   app.get("/api/admin/users", isAdmin, async (req: any, res) => {
     try {

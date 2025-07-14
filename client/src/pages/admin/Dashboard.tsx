@@ -41,6 +41,10 @@ export default function AdminDashboard() {
     queryKey: ["/api/admin/dashboard/activity"],
   });
 
+  const { data: systemAlerts, isLoading: alertsLoading } = useQuery({
+    queryKey: ["/api/admin/dashboard/alerts"],
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
@@ -217,34 +221,70 @@ export default function AdminDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                    <span className="text-red-400 text-sm font-medium">High Priority</span>
-                  </div>
-                  <p className="text-gray-200 text-sm">Multiple failed login attempts detected</p>
-                  <p className="text-gray-400 text-xs mt-1">2 minutes ago</p>
+              {alertsLoading ? (
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="h-16 bg-slate-700 rounded w-full"></div>
+                    </div>
+                  ))}
                 </div>
-                
-                <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                    <span className="text-yellow-400 text-sm font-medium">Medium Priority</span>
-                  </div>
-                  <p className="text-gray-200 text-sm">Database connection slow</p>
-                  <p className="text-gray-400 text-xs mt-1">15 minutes ago</p>
+              ) : (
+                <div className="space-y-4 max-h-80 overflow-y-auto">
+                  {systemAlerts && systemAlerts.length > 0 ? (
+                    systemAlerts.map((alert: any, index: number) => {
+                      const getAlertClasses = (color: string) => {
+                        switch (color) {
+                          case 'red':
+                            return {
+                              bg: 'bg-red-500/10 border-red-500/20',
+                              dot: 'bg-red-400',
+                              text: 'text-red-400'
+                            };
+                          case 'yellow':
+                            return {
+                              bg: 'bg-yellow-500/10 border-yellow-500/20',
+                              dot: 'bg-yellow-400',
+                              text: 'text-yellow-400'
+                            };
+                          case 'blue':
+                            return {
+                              bg: 'bg-blue-500/10 border-blue-500/20',
+                              dot: 'bg-blue-400',
+                              text: 'text-blue-400'
+                            };
+                          default:
+                            return {
+                              bg: 'bg-gray-500/10 border-gray-500/20',
+                              dot: 'bg-gray-400',
+                              text: 'text-gray-400'
+                            };
+                        }
+                      };
+                      
+                      const classes = getAlertClasses(alert.color);
+                      
+                      return (
+                        <div key={index} className={`p-3 ${classes.bg} border rounded-lg`}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className={`w-2 h-2 ${classes.dot} rounded-full`}></div>
+                            <span className={`${classes.text} text-sm font-medium`}>{alert.priority}</span>
+                          </div>
+                          <p className="text-gray-200 text-sm">{alert.message}</p>
+                          <p className="text-gray-400 text-xs mt-1">
+                            {new Date(alert.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="p-4 text-center text-gray-400">
+                      <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>No system alerts at this time</p>
+                    </div>
+                  )}
                 </div>
-
-                <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                    <span className="text-blue-400 text-sm font-medium">Info</span>
-                  </div>
-                  <p className="text-gray-200 text-sm">New user registration spike</p>
-                  <p className="text-gray-400 text-xs mt-1">1 hour ago</p>
-                </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
