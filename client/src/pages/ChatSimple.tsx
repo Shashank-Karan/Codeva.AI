@@ -14,14 +14,7 @@ import {
   User,
   Copy,
   Trash2,
-  FileCode,
-  FileImage,
-  FileText,
-  Brain,
-  Code,
-  BookOpen,
-  MessageCircle,
-  Sparkles
+  Brain
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,19 +30,12 @@ interface ChatMessage {
   };
 }
 
-const chatModes = [
-  { id: 'general', name: 'General', icon: MessageCircle, prompt: 'You are a helpful AI assistant.' },
-  { id: 'code', name: 'Code', icon: Code, prompt: 'You are a programming expert.' },
-  { id: 'learning', name: 'Learning', icon: BookOpen, prompt: 'You are an educational tutor.' },
-  { id: 'creative', name: 'Creative', icon: Sparkles, prompt: 'You are a creative assistant.' }
-];
-
 export default function ChatSimple() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [fileContent, setFileContent] = useState<string>("");
   const [fileName, setFileName] = useState<string>("");
-  const [selectedMode, setSelectedMode] = useState(chatModes[0]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -61,12 +47,7 @@ export default function ChatSimple() {
 
   const chatMutation = useMutation({
     mutationFn: async (data: { message: string; fileContent?: string; fileType?: string }) => {
-      const enhancedMessage = `${selectedMode.prompt}\n\nUser Question: ${data.message}`;
-      const response = await apiRequest("POST", "/api/chat", {
-        message: enhancedMessage,
-        fileContent: data.fileContent,
-        fileType: data.fileType
-      });
+      const response = await apiRequest("POST", "/api/chat", data);
       return await response.json();
     },
     onSuccess: (data) => {
@@ -177,29 +158,6 @@ export default function ChatSimple() {
           <p className="text-gray-300">
             Upload files and ask questions. Get instant AI-powered answers!
           </p>
-        </div>
-
-        {/* Chat Mode Selector */}
-        <div className="flex justify-center mb-6">
-          <div className="flex gap-2 p-1 bg-slate-800/40 rounded-lg border border-slate-700/50">
-            {chatModes.map((mode) => {
-              const IconComponent = mode.icon;
-              return (
-                <button
-                  key={mode.id}
-                  onClick={() => setSelectedMode(mode)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                    selectedMode.id === mode.id
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-300 hover:bg-slate-700/50'
-                  }`}
-                >
-                  <IconComponent className="w-4 h-4" />
-                  {mode.name}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {/* Main Chat Container */}
@@ -321,8 +279,7 @@ export default function ChatSimple() {
               </Button>
             </div>
 
-            <div className="mt-2 flex items-center justify-between text-xs text-gray-400">
-              <span>Mode: {selectedMode.name}</span>
+            <div className="mt-2 flex items-center justify-end text-xs text-gray-400">
               <button onClick={clearChat} className="hover:text-gray-300">
                 Clear chat
               </button>
