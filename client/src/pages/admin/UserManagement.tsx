@@ -42,7 +42,14 @@ export default function UserManagement() {
   });
   const [page, setPage] = useState(1);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [newUser, setNewUser] = useState({
+    username: "",
+    email: "",
+    password: "",
+    role: "user"
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -109,6 +116,29 @@ export default function UserManagement() {
       toast({
         title: "User deleted",
         description: "User has been deleted successfully",
+      });
+    }
+  });
+
+  const addUserMutation = useMutation({
+    mutationFn: async (userData: typeof newUser) => {
+      const response = await apiRequest("POST", "/api/admin/users", userData);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setIsAddDialogOpen(false);
+      setNewUser({ username: "", email: "", password: "", role: "user" });
+      toast({
+        title: "User created",
+        description: "New user has been created successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to create user",
+        variant: "destructive"
       });
     }
   });
@@ -221,7 +251,10 @@ export default function UserManagement() {
           <CardHeader>
             <CardTitle className="text-white flex items-center justify-between">
               <span>Users ({usersData?.total || 0})</span>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => setIsAddDialogOpen(true)}
+              >
                 <Plus className="w-4 h-4 mr-2" />
                 Add User
               </Button>
@@ -400,6 +433,81 @@ export default function UserManagement() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add User Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="new-username">Username</Label>
+              <Input
+                id="new-username"
+                value={newUser.username}
+                onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                className="bg-slate-700/50 border-slate-600 text-white"
+                placeholder="Enter username"
+              />
+            </div>
+            <div>
+              <Label htmlFor="new-email">Email</Label>
+              <Input
+                id="new-email"
+                type="email"
+                value={newUser.email}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                className="bg-slate-700/50 border-slate-600 text-white"
+                placeholder="Enter email address"
+              />
+            </div>
+            <div>
+              <Label htmlFor="new-password">Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                className="bg-slate-700/50 border-slate-600 text-white"
+                placeholder="Enter password"
+              />
+            </div>
+            <div>
+              <Label htmlFor="new-role">Role</Label>
+              <Select
+                value={newUser.role}
+                onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+              >
+                <SelectTrigger className="bg-slate-700/50 border-slate-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="moderator">Moderator</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button 
+                onClick={() => addUserMutation.mutate(newUser)}
+                disabled={!newUser.username || !newUser.email || !newUser.password || addUserMutation.isPending}
+                className="bg-blue-600 hover:bg-blue-700 flex-1"
+              >
+                {addUserMutation.isPending ? "Creating..." : "Create User"}
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => setIsAddDialogOpen(false)}
+                className="bg-slate-700/50 border-slate-600 text-white hover:bg-slate-600"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

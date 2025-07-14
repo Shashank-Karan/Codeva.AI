@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { storage } from "./storage";
 import { eq, desc, and, gte, count, sql } from "drizzle-orm";
-import { users, posts, codeAnalysis, debugResults, adminLogs, systemSettings, notifications } from "@shared/schema";
+import { users, posts, codeAnalysis, debugResults, adminLogs, systemSettings, notifications, loginAttempts } from "@shared/schema";
 import { db } from "./db";
 
 // Middleware to check if user is admin - Only allow owner
@@ -215,6 +215,59 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ message: "Failed to fetch users" });
+    }
+  });
+
+  // Create User
+  app.post("/api/admin/users", isAdmin, async (req: any, res) => {
+    try {
+      const { username, email, password, role } = req.body;
+
+      // Check if user already exists
+      const existingUser = await db.select().from(users).where(eq(users.username, username)).limit(1);
+      if (existingUser.length > 0) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      const existingEmail = await db.select().from(users).where(eq(users.email, email)).limit(1);
+      if (existingEmail.length > 0) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+
+      // Hash the password using the same method as auth.ts
+      const { randomBytes, scrypt } = await import("crypto");
+      const { promisify } = await import("util");
+      const scryptAsync = promisify(scrypt);
+      
+      const salt = randomBytes(16).toString("hex");
+      const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+      const hashedPassword = `${buf.toString("hex")}.${salt}`;
+
+      // Create the user
+      const newUser = await db.insert(users).values({
+        username,
+        email,
+        password: hashedPassword,
+        role: role || "user",
+        isActive: true,
+        isBanned: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+
+      await logAdminAction(
+        req.user.id,
+        "create",
+        "user",
+        newUser[0].id.toString(),
+        `Created new user: ${username}`,
+        req
+      );
+
+      res.json({ success: true, user: newUser[0] });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ message: "Failed to create user" });
     }
   });
 
