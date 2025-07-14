@@ -4,17 +4,16 @@ import { eq, desc, and, gte, count, sql } from "drizzle-orm";
 import { users, posts, codeAnalysis, debugResults, adminLogs, systemSettings, notifications } from "@shared/schema";
 import { db } from "./db";
 
-// Middleware to check if user is admin
+// Middleware to check if user is admin - Only allow owner
 function isAdmin(req: any, res: any, next: any) {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
   }
   
-  // For now, check if user is authenticated. In production, add role checking
-  // const user = await storage.getUser(req.user.id);
-  // if (!user || user.role !== 'admin') {
-  //   return res.status(403).json({ message: "Forbidden - Admin access required" });
-  // }
+  // Only allow user with username 'admin' to access admin panel
+  if (req.user.username !== 'admin') {
+    return res.status(403).json({ message: "Access denied - Only owner can access admin panel" });
+  }
   
   next();
 }

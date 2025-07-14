@@ -81,8 +81,8 @@ export default function AppNavigation() {
 
 
 
-            {/* Admin Panel Link - Show for all users for now, add role checking later */}
-            {user && (
+            {/* Admin Panel Link - Only show for admin user */}
+            {user && user.username === 'admin' && (
               <Link href="/admin">
                 <Button
                   variant="ghost"
@@ -166,8 +166,8 @@ export default function AppNavigation() {
 
 
 
-              {/* Mobile Admin Panel Link */}
-              {user && (
+              {/* Mobile Admin Panel Link - Only show for admin user */}
+              {user && user.username === 'admin' && (
                 <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
                   <Button
                     variant="ghost"
