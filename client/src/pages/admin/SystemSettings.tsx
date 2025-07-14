@@ -285,6 +285,125 @@ export default function SystemSettings() {
             </Card>
           </TabsContent>
 
+          {/* Email Settings */}
+          <TabsContent value="email" className="space-y-6">
+            <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-blue-400" />
+                  Email Configuration
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="smtp-host" className="text-white">SMTP Host</Label>
+                    <Input
+                      id="smtp-host"
+                      value={getSetting("smtp_host") || "smtp.gmail.com"}
+                      onChange={(e) => handleSettingChange("smtp_host", e.target.value)}
+                      placeholder="smtp.gmail.com"
+                      className="bg-slate-700/50 border-slate-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="smtp-port" className="text-white">SMTP Port</Label>
+                    <Input
+                      id="smtp-port"
+                      type="number"
+                      value={getSetting("smtp_port") || "587"}
+                      onChange={(e) => handleSettingChange("smtp_port", e.target.value)}
+                      className="bg-slate-700/50 border-slate-600 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="smtp-username" className="text-white">SMTP Username</Label>
+                    <Input
+                      id="smtp-username"
+                      value={getSetting("smtp_username") || ""}
+                      onChange={(e) => handleSettingChange("smtp_username", e.target.value)}
+                      placeholder="your-email@gmail.com"
+                      className="bg-slate-700/50 border-slate-600 text-white"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="smtp-password" className="text-white">SMTP Password</Label>
+                    <Input
+                      id="smtp-password"
+                      type="password"
+                      value={getSetting("smtp_password") || ""}
+                      onChange={(e) => handleSettingChange("smtp_password", e.target.value)}
+                      placeholder="App password"
+                      className="bg-slate-700/50 border-slate-600 text-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="from-email" className="text-white">From Email Address</Label>
+                  <Input
+                    id="from-email"
+                    type="email"
+                    value={getSetting("from_email") || "noreply@codeva.ai"}
+                    onChange={(e) => handleSettingChange("from_email", e.target.value)}
+                    className="bg-slate-700/50 border-slate-600 text-white"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="from-name" className="text-white">From Name</Label>
+                  <Input
+                    id="from-name"
+                    value={getSetting("from_name") || "Codeva.AI"}
+                    onChange={(e) => handleSettingChange("from_name", e.target.value)}
+                    className="bg-slate-700/50 border-slate-600 text-white"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
+                  <div>
+                    <h4 className="text-white font-medium">Enable SSL/TLS</h4>
+                    <p className="text-gray-400 text-sm">Use secure connection for email sending</p>
+                  </div>
+                  <Switch
+                    checked={getSetting("smtp_ssl") === "true"}
+                    onCheckedChange={(checked) => handleSettingChange("smtp_ssl", checked.toString())}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg">
+                  <div>
+                    <h4 className="text-white font-medium">Email Notifications</h4>
+                    <p className="text-gray-400 text-sm">Send email notifications for important events</p>
+                  </div>
+                  <Switch
+                    checked={getSetting("email_notifications") === "true"}
+                    onCheckedChange={(checked) => handleSettingChange("email_notifications", checked.toString())}
+                  />
+                </div>
+
+                <div className="pt-4">
+                  <Button 
+                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={() => {
+                      // Test email functionality
+                      toast({
+                        title: "Test Email",
+                        description: "Test email functionality would be implemented here",
+                      });
+                    }}
+                  >
+                    <Mail className="w-4 h-4 mr-2" />
+                    Send Test Email
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* API Settings */}
           <TabsContent value="api" className="space-y-6">
             <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm">
