@@ -33,6 +33,10 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  role: varchar("role", { length: 20 }).default("user"),
+  isActive: boolean("is_active").default(true),
+  isBanned: boolean("is_banned").default(false),
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -263,6 +267,73 @@ export const insertChatMessageSchema = createInsertSchema(chatMessages).pick({
   fileInfo: true,
 });
 
+// Admin tables
+export const adminLogs = pgTable("admin_logs", {
+  id: serial("id").primaryKey(),
+  adminId: integer("admin_id").notNull().references(() => users.id),
+  action: varchar("action", { length: 100 }).notNull(),
+  targetType: varchar("target_type", { length: 50 }),
+  targetId: varchar("target_id"),
+  description: text("description"),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const systemSettings = pgTable("system_settings", {
+  id: serial("id").primaryKey(),
+  key: varchar("key", { length: 100 }).unique().notNull(),
+  value: text("value"),
+  type: varchar("type", { length: 20 }).default("string"),
+  description: text("description"),
+  updatedBy: integer("updated_by").references(() => users.id),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  title: varchar("title").notNull(),
+  message: text("message").notNull(),
+  type: varchar("type", { length: 20 }).default("info"),
+  isRead: boolean("is_read").default(false),
+  isGlobal: boolean("is_global").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const loginAttempts = pgTable("login_attempts", {
+  id: serial("id").primaryKey(),
+  email: varchar("email"),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  success: boolean("success").default(false),
+  attemptedAt: timestamp("attempted_at").defaultNow(),
+});
+
+// Admin schemas
+export const insertAdminLogSchema = createInsertSchema(adminLogs).pick({
+  action: true,
+  targetType: true,
+  targetId: true,
+  description: true,
+  ipAddress: true,
+  userAgent: true,
+});
+
+export const insertSystemSettingSchema = createInsertSchema(systemSettings).pick({
+  key: true,
+  value: true,
+  type: true,
+  description: true,
+});
+
+export const insertNotificationSchema = createInsertSchema(notifications).pick({
+  title: true,
+  message: true,
+  type: true,
+  isGlobal: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -289,3 +360,10 @@ export type ChatConversationWithMessages = ChatConversation & { messages: ChatMe
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertChatConversation = z.infer<typeof insertChatConversationSchema>;
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type AdminLog = typeof adminLogs.$inferSelect;
+export type InsertAdminLog = z.infer<typeof insertAdminLogSchema>;
+export type SystemSetting = typeof systemSettings.$inferSelect;
+export type InsertSystemSetting = z.infer<typeof insertSystemSettingSchema>;
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type LoginAttempt = typeof loginAttempts.$inferSelect;

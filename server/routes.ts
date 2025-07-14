@@ -5,6 +5,7 @@ import { Chess } from "chess.js";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { analyzeCode, debugCode, chatWithAI } from "./services/gemini";
+import { registerAdminRoutes } from "./adminRoutes";
 import { insertPostSchema, insertCodeAnalysisSchema, insertDebugSchema, insertChessGameSchema, insertChessMessageSchema, insertChatConversationSchema, insertChatMessageSchema } from "@shared/schema";
 
 // Simple auth middleware
@@ -18,6 +19,9 @@ function isAuthenticated(req: any, res: any, next: any) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   setupAuth(app);
+  
+  // Register admin routes
+  registerAdminRoutes(app);
 
   // Code analysis routes
   app.post('/api/analyze', async (req: any, res) => {

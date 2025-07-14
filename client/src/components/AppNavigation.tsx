@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User, Code, MoreHorizontal } from "lucide-react";
+import { Home, Eye, Bug, Users, MessageCircle, LogOut, Menu, X, User, Code, MoreHorizontal, Shield } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -81,6 +81,27 @@ export default function AppNavigation() {
 
 
 
+            {/* Admin Panel Link - Show for all users for now, add role checking later */}
+            {user && (
+              <Link href="/admin">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`flex items-center space-x-2 relative group transition-all duration-200 ${
+                    location.startsWith('/admin')
+                      ? "bg-red-600/20 text-red-300 border border-red-500/30" 
+                      : "text-gray-300 hover:text-white hover:bg-slate-800/60"
+                  }`}
+                >
+                  <Shield className={`h-4 w-4 transition-transform duration-200 ${location.startsWith('/admin') ? 'scale-110' : 'group-hover:scale-105'}`} />
+                  <span>Admin</span>
+                  {location.startsWith('/admin') && (
+                    <div className="absolute -bottom-0.5 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gradient-to-r from-red-500 to-orange-500 rounded-full"></div>
+                  )}
+                </Button>
+              </Link>
+            )}
+
             {/* User Menu */}
             {user && (
               <div className="flex items-center space-x-3 ml-4 pl-4 border-l border-slate-700">
@@ -144,6 +165,23 @@ export default function AppNavigation() {
               })}
 
 
+
+              {/* Mobile Admin Panel Link */}
+              {user && (
+                <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
+                  <Button
+                    variant="ghost"
+                    className={`w-full justify-start space-x-3 py-3 ${
+                      location.startsWith('/admin')
+                        ? "bg-red-600/20 text-red-300 border border-red-500/30" 
+                        : "text-gray-300 hover:text-white hover:bg-slate-800/60"
+                    }`}
+                  >
+                    <Shield className="h-5 w-5" />
+                    <span>Admin Panel</span>
+                  </Button>
+                </Link>
+              )}
 
               {/* Mobile User Menu */}
               {user && (

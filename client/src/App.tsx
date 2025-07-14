@@ -24,6 +24,12 @@ import Others from "./pages/Others";
 import AuthPageSimple from "@/pages/auth-page-simple";
 import SimpleAuthTest from "@/pages/simple-auth-test";
 import NotFound from "@/pages/not-found";
+import Dashboard from "@/pages/admin/Dashboard";
+import UserManagement from "@/pages/admin/UserManagement";
+import SystemSettings from "@/pages/admin/SystemSettings";
+import AuditLogs from "@/pages/admin/AuditLogs";
+import ContentManagement from "@/pages/admin/ContentManagement";
+import Analytics from "@/pages/admin/Analytics";
 
 function Router() {
   const { user, isLoading } = useAuth();
@@ -57,6 +63,15 @@ function Router() {
           <Route path="/puzzles" component={Puzzles} />
           <Route path="/settings" component={Settings} />
           <Route path="/others" component={Others} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" component={Dashboard} />
+          <Route path="/admin/dashboard" component={Dashboard} />
+          <Route path="/admin/users" component={UserManagement} />
+          <Route path="/admin/settings" component={SystemSettings} />
+          <Route path="/admin/logs" component={AuditLogs} />
+          <Route path="/admin/content" component={ContentManagement} />
+          <Route path="/admin/analytics" component={Analytics} />
 
         </>
       ) : (
