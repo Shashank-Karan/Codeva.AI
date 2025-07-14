@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import AppNavigation from "@/components/AppNavigation";
+import { Link } from "wouter";
 import { 
   Users, 
   MessageSquare, 
@@ -252,29 +253,35 @@ export default function AdminDashboard() {
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-700/40 transition-colors cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Users className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-                <h3 className="text-white font-semibold">Manage Users</h3>
-                <p className="text-gray-400 text-sm mt-1">View, edit, and manage user accounts</p>
-              </CardContent>
-            </Card>
+            <Link href="/admin/users">
+              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-700/40 transition-all duration-200 cursor-pointer group">
+                <CardContent className="p-6 text-center">
+                  <Users className="w-8 h-8 text-blue-400 mx-auto mb-3 group-hover:scale-110 transition-transform duration-200" />
+                  <h3 className="text-white font-semibold group-hover:text-blue-300 transition-colors">Manage Users</h3>
+                  <p className="text-gray-400 text-sm mt-1">View, edit, and manage user accounts</p>
+                </CardContent>
+              </Card>
+            </Link>
 
-            <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-700/40 transition-colors cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Settings className="w-8 h-8 text-green-400 mx-auto mb-3" />
-                <h3 className="text-white font-semibold">System Settings</h3>
-                <p className="text-gray-400 text-sm mt-1">Configure application settings</p>
-              </CardContent>
-            </Card>
+            <Link href="/admin/settings">
+              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-700/40 transition-all duration-200 cursor-pointer group">
+                <CardContent className="p-6 text-center">
+                  <Settings className="w-8 h-8 text-green-400 mx-auto mb-3 group-hover:scale-110 transition-transform duration-200" />
+                  <h3 className="text-white font-semibold group-hover:text-green-300 transition-colors">System Settings</h3>
+                  <p className="text-gray-400 text-sm mt-1">Configure application settings</p>
+                </CardContent>
+              </Card>
+            </Link>
 
-            <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-700/40 transition-colors cursor-pointer">
-              <CardContent className="p-6 text-center">
-                <Eye className="w-8 h-8 text-purple-400 mx-auto mb-3" />
-                <h3 className="text-white font-semibold">Audit Logs</h3>
-                <p className="text-gray-400 text-sm mt-1">Review system activity and changes</p>
-              </CardContent>
-            </Card>
+            <Link href="/admin/logs">
+              <Card className="bg-slate-800/40 border-slate-700/50 backdrop-blur-sm hover:bg-slate-700/40 transition-all duration-200 cursor-pointer group">
+                <CardContent className="p-6 text-center">
+                  <Eye className="w-8 h-8 text-purple-400 mx-auto mb-3 group-hover:scale-110 transition-transform duration-200" />
+                  <h3 className="text-white font-semibold group-hover:text-purple-300 transition-colors">Audit Logs</h3>
+                  <p className="text-gray-400 text-sm mt-1">Review system activity and changes</p>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
       </div>
