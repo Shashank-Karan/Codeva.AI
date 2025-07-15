@@ -119,7 +119,7 @@ export default function Landing() {
           {/* Badge */}
           <div className="inline-flex items-center px-4 py-2 bg-blue-600/20 backdrop-blur-sm rounded-full text-blue-300 text-sm mb-6 sm:mb-8 border border-blue-500/20 animate-[float_3s_ease-in-out_infinite_1s]">
             <div className="h-2 w-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
-            AI-Powered Code Analysis & Chess Gaming
+            AI-Powered Code Analysis
           </div>
 
           {/* Main heading with floating and glowing effect */}
@@ -140,8 +140,7 @@ export default function Landing() {
 
           {/* Subtitle */}
           <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 mb-10 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-4">
-            Transform complex code into interactive visualizations with step-by-step explanations, 
-            plus enjoy strategic chess gameplay with AI opponents and multiplayer matches.
+          Let AI simplify your code - visualize, explain, and monitor it in real time.
           </p>
 
           {/* CTA Buttons */}
@@ -150,12 +149,6 @@ export default function Landing() {
               <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <Eye className="h-5 w-5 mr-2" />
                 Start Visualizing
-              </Button>
-            </Link>
-            <Link href="/chess">
-              <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <Crown className="h-5 w-5 mr-2" />
-                Play Chess
               </Button>
             </Link>
             <Link href="/community">
@@ -520,13 +513,13 @@ export default function Landing() {
                       <div className="flex items-center space-x-3 mb-2">
                         <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
                         <div>
-                          <p className="text-white text-sm font-medium">Sarah_Dev</p>
+                          <p className="text-white text-sm font-medium">Sania Rajput</p>
                           <p className="text-gray-400 text-xs">Shared a sorting algorithm</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-4 text-gray-400 text-xs">
-                        <span>👍 24 likes</span>
-                        <span>💬 8 comments</span>
+                        <span>👍 9 likes</span>
+                        <span>💬 5 comments</span>
                       </div>
                     </div>
                     <Link href="/community">
