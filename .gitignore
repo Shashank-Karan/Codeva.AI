@@ -1,20 +1,69 @@
-node_modules
-dist
-.DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
-*.log
-*.tmp
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+server/public/
+
+# IDE files
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
-.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
 coverage/
+.coverage/
 .nyc_output/
+
+# Temporary folders
+tmp/
+temp/
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# Vite specific
+vite.config.ts.*
+
+# Archive files
+*.tar.gz
+*.zip
+*.rar
+
+# Database
+*.db
+*.sqlite
+
+# Misc
+*.tmp
