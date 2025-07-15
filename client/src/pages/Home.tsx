@@ -19,7 +19,7 @@ export default function Home() {
         entries.forEach((entry) => {
           const cardIndex = parseInt(entry.target.getAttribute('data-card-index') || '0');
           if (entry.isIntersecting) {
-            setVisibleCards(prev => new Set([...prev, cardIndex]));
+            setVisibleCards(prev => new Set([...Array.from(prev), cardIndex]));
           } else {
             setVisibleCards(prev => {
               const newSet = new Set(prev);
